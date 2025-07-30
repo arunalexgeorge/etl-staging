@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_inventory_updation,Inventory Updation,model_inventory_updation,,1,1,1,0
+access_reconcile_report,reconcile.report,model_reconcile_report,,1,1,1,1
+access_stock_ageing,stock_ageing,model_stock_ageing,,1,1,1,1
+access_serial_report,serial_report,model_serial_report,,1,1,1,1

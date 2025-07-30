@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_product_alt_uom,product_alt_uom,model_product_alt_uom,,1,1,1,0
+access_product_group1,Product Group1,model_product_group1,,1,1,1,0
+access_product_group2,Product Group2,model_product_group2,,1,1,1,0
+access_product_group3,Product Group3,model_product_group3,,1,1,1,0
+access_product_group4,Product Group4,model_product_group4,,1,1,1,0
+access_hs_code,HS Code,model_hs_code,,1,1,1,0
+access_eway_transporter,eway_transporter,model_eway_transporter,,1,1,1,0
+access_stock_serial,Serial Numbers,model_stock_serial,,1,1,1,1
+access_stock_serial_line,Serial Number Lines,model_stock_serial_line,,1,1,1,1
+access_stock_serial_location,Locationwise Serial Number,model_stock_serial_location,,1,1,1,1
+access_picking_serial_line,Serial Number Lines,model_picking_serial_line,,1,1,1,1

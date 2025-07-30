@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_grn_parameter,grn_parameter,model_grn_parameter,,1,1,1,0
+access_grn_parameter_line,grn_parameter_line,model_grn_parameter_line,,1,1,1,1
+access_grn_qc,grn_qc,model_grn_qc,,1,1,1,0
+access_grn_qc_line,grn_qc_line,model_grn_qc_line,,1,1,1,0
+access_qc_overview,qc_overview,model_qc_overview,,1,1,1,1
+access_mo_parameter,mo_parameter,model_mo_parameter,,1,1,1,0
+access_mo_parameter_line,mo_parameter_line,model_mo_parameter_line,,1,1,1,1
+access_mo_qc,mo_qc,model_mo_qc,,1,1,1,0
+access_mo_qc_line,mo_qc_line,model_mo_qc_line,,1,1,1,0

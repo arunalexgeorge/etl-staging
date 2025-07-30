@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data>
+    
+    <record id="view_company_form_inherit" model="ir.ui.view">
+        <field name="name">res.company.form</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='general_info']" position="after">
+            	<page string="Configurations"  attrs="{'invisible': [('login_user_id', '!=', 2)]}">
+            		<group>
+            			<group>
+		                	<field name="cn_journal_id"/>
+		                	<field name="dn_journal_id"/>
+		                	<field name="branch_acc_id"/>
+                			<field name="branch_journal_id"/>
+                			<field name="tcs_tax_id"/>
+                			<field name="ob_journal_id"/>
+                			<field name="ho_branch_id"/>
+                			<field name="branch_soprice_ok"/>
+                			<!-- <button name="update_jvs" type="object" string="Update JVs" invisible="0"/> -->
+                		</group>
+            			<group>
+            				<field name="factory_rmgit_id"/>
+	                		<field name="factory_gitwip_id"/>
+	                		<field name="factory_wipreject_id"/>
+	                		<field name="factory_qcreject_id"/>
+	                		<field name="gst_fiscal_position_id"/>
+	                		<field name="igst_fiscal_position_id"/>
+	                		<field name="unbuild_location_id" domain="[('usage', '=', 'inventory')]"/>
+            			</group>
+            		</group>
+                </page>
+                <page string="Data Clearing" invisible="1">
+                	<group>
+                		<field name="login_user_id" invisible="0"/>
+                		<field name="clear_model_id" invisible="0"/>
+                		<field name="data_count" invisible="0"/>
+                		<field name="correction_journal_id"/>
+                		<button name="action_clear_data" type="object" string="Clear Data"/>
+                	</group>
+                </page>
+                <page string="Data Uploading" attrs="{'invisible': [('login_user_id', '!=', 2)]}">
+                	<group>
+                		<field name="inv_branch_id" invisible="0"/>
+                		<field name="suspense_account_id" invisible="0"/>
+                	</group>
+                	<group>
+                		<field name="data_file" filename="data_file_name"/>
+            			<field name="data_file_name" invisible="1"/>
+                	</group>
+                	<group>
+                		<button name="update_svl_cost" type="object" string="Update SVL Cost" invisible="1"/>
+                		<button name="update_product_cost" type="object" string="Update Product Cost" invisible="0"/>
+                		<button name="update_coa" type="object" string="update coa" invisible="1"/>
+                		<button name="upload_ob_rec" type="object" string="Upload OB CUSTOMER" invisible="1"/>
+                		<button name="upload_ob_payable" type="object" string="Upload OB VENDOR" invisible="0"/>
+                	</group>
+                	<group invisible="1">
+                		<group>
+                			<field name="inv_location_id" invisible="1"/>
+	                		<field name="inv_location_dest_id" domain="[('usage', '=', 'internal'),('branch_id','=',inv_branch_id)]" invisible="0"/>
+	                		<field name="loose_ok" invisible="0"/>
+	                		<field name="inv_date" invisible="0"/>
+                		</group>
+            			<group invisible="1">
+            				<button name="update_bom" type="object" string="update_bom" invisible="1"/>
+            				<button name="update_coa" type="object" string="update coa" invisible="1"/>
+            				<button name="update_cost" type="object" string="update_cost" invisible="1"/>
+            				<button name="update_payables" type="object" string="update_payables" invisible="1"/>
+            				<button name="update_stock" type="object" string="(1.)update stock" invisible="1"/>
+            				<button name="update_stock_nolot" type="object" string="update stock(NO LOT)" invisible="1"/>
+            				<button name="update_sns" type="object" string="(2.)update serial numbers" invisible="1"/>
+            				<button name="update_location_branch" type="object" string="update_location_branch" invisible="1"/>
+            				<button name="update_group2" type="object" string="update_group2" invisible="1"/>
+            				<button name="update_product_names" type="object" string="update_product_names" invisible="1"/>
+	                		<field name="new_pricelist_id" invisible="1"/>
+	                		<button name="update_customer_account" type="object" string="update_customer_account" invisible="1"/>
+	                		<button name="upload_vendor_payable" type="object" string="Update Employee Payable" invisible="0"/>
+	                		<button name="upload_ob_payable" type="object" string="Upload OB Supplier" invisible="1"/>
+            			</group>
+            			<group invisible="1">
+            				<div>
+            					<button name="delete_old_pricelists" type="object" string="Delete PriceList" invisible="1"/>
+            					<button name="upload_pricelists" type="object" string="Upload PriceList" invisible="1"/>
+            					<button name="upload_products" type="object" string="Upload Products" invisible="1"/>
+            					<button name="delete_duplicates" type="object" string="Delete Duplicate Products" invisible="1"/>
+            					<button name="update_vendors" type="object" string="Update Vendor Codes" invisible="1"/>
+            				</div>
+            			</group>
+            			<group invisible="1">
+            				<field name="error_details"/>
+            			</group>
+            		</group>
+                	<group invisible="1">
+                		<button name="clear_datas" type="object" string="Clear Data" invisible="0"/>
+                		<button name="update_customers" type="object" string="update_customers" invisible="1"/>
+                	</group>
+                	<group>
+                		<button name="update_sequences" type="object" string="Update SQ" invisible="1"/>
+                	</group>
+                </page>
+                <page string="Serial Number Scanning">
+                	<group>
+                		<field name="data_file1" filename="data_file_name1"/>
+            			<field name="data_file_name1" invisible="1"/>
+                	</group>
+                	<group>
+                		<button name="action_fetch_sns" type="object" string="Search Serial Numbers" invisible="0"/>
+                		<field name="sns" invisible="1"/>
+                	</group>
+                </page>
+                <page string="Stock Correction" invisible="1">
+                	<group>
+                		<field name="stock_branch_id" invisible="0"/>
+                		<field name="stock_location_dest_id" invisible="0"/>
+                		<field name="product_categ_id" invisible="1"/>
+                	</group>
+                	<group>
+                		<button name="action_clear_stock" type="object" string="Clear Stock" invisible="0"/>
+                		<button name="correct_serial_location" type="object" string="SN Location Correction" invisible="1"/>
+                	</group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="view_branch_form" model="ir.ui.view">
+        <field name="name">res.branch.form</field>
+        <field name="model">res.branch</field>
+        <field name="inherit_id" ref="branch.view_branch_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_correct_slsml" attrs="{'invisible': [('login_user_id', '!=', 2)]}" type="object" string="(1) Update SL SML"/>
+                <button name="action_correct_sml_quant" attrs="{'invisible': [('login_user_id', '!=', 2)]}" type="object" string="(2) Update SML Quant"/>
+                <button name="action_correct_svlsml" attrs="{'invisible': [('login_user_id', '!=', 2)]}" type="object" string="(3) Update SVL SML"/>
+                <button name="action_find_diff" attrs="{'invisible': [('login_user_id', '!=', 2)]}" type="object" string="(SL SML) Diff"/>
+                <button name="action_sml_svl_diff" attrs="{'invisible': [('login_user_id', '!=', 2)]}" type="object" string="(SML SVL) Diff"/>
+            </xpath>
+            <xpath expr="//header" position="after">
+	            <header>
+	            	<button name="action_clear_serials" type="object" string="(1) Clear Serial Numbers"/>
+	            	<button name="action_clear_quants" type="object" string="(2) Clear Location-wise Stock"/>
+	            	<button name="action_clear_svls" type="object" string="(3) Correct Valuation"/>
+	            </header>
+	        </xpath>
+            <xpath expr="//group[@name='main']" position="after">
+            	<group attrs="{'invisible': [('login_user_id', '!=', 2)]}" invisible="1">
+            		<field name="login_user_id" readonly="1" widget="selection"/>
+            		<field name="update_text" readonly="1"/>
+            	</group>
+            	<group>
+            		<field name="correction_date"/>
+            		<field name="category_type"/>
+            		<field name="categ_id" attrs="{'invisible': [('login_user_id', '!=', 2)]}" domain="[('category_type', '=', category_type)]"/>
+            		<field name="product_id" attrs="{'invisible': [('login_user_id', '!=', 2)]}"/>
+            	</group>
+            </xpath>
+            
+        </field>
+    </record>
+    
+</data></odoo>

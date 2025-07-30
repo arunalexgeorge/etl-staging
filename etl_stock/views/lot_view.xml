@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data>
+    
+   	<record id="paperformat_barcode_label" model="report.paperformat">
+			<field name="name">Barcode Label</field>
+			<field name="default" eval="True" />
+			<field name="page_height">29</field>
+			<field name="page_width">62</field>
+			<field name="format">custom</field>
+			<field name="orientation">Portrait</field>
+			<field name="margin_top">0</field>
+			<field name="margin_bottom">0</field>
+			<field name="margin_left">0</field>
+			<field name="margin_right">0</field>
+			<field name="header_line" eval="False" />
+			<field name="header_spacing">0</field>
+			<field name="dpi">144</field>
+		</record>
+		
+		<record id="action_product_serial_print" model="ir.actions.report">
+           <field name="name">Barcode Label</field>
+           <field name="model">stock.serial</field>
+           <field name="report_type">qweb-pdf</field>
+           <field name="report_name">etl_stock.report_product_serial</field>
+           <field name="report_file">etl_stock.report_product_serial</field>
+           <field name="binding_type">report</field>
+           <field name="paperformat_id" ref="etl_stock.paperformat_barcode_label"/>
+   	</record>
+        
+    <record id="stock.view_production_lot_form" model="ir.ui.view">
+        <field name="name">stock.production.lot.form</field>
+        <field name="model">stock.lot</field>
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+            <form string="Lot Numbers">
+                <sheet>
+                <field name="company_id" invisible="1"/>
+                <field name="display_complete" invisible="1"/>
+                <div class="oe_button_box" name="button_box"
+                     attrs="{'invisible': [('display_complete', '=', False)]}">
+                        <button class="oe_stat_button" name="action_lot_open_transfers"
+                                type="object" icon="fa-truck" help="Transfers"
+                                attrs="{'invisible': [('delivery_count', '=', 0)]}">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_value">
+                                    <field name="delivery_count" widget="statinfo" nolabel="1" class="mr4"/>
+                                </span>
+                                <span class="o_stat_text">Transfers</span>
+                            </div>
+                        </button>                           
+                        <button name="action_lot_open_quants" icon="fa-arrows" class="oe_stat_button" string="Location" type="object"/>
+                        <button name="%(stock.action_stock_report)d" icon="fa-arrow-up" class="oe_stat_button" string="Traceability" type="action"/>
+                </div>
+                <group name="main_group">
+                    <group name="gp1">
+                    	<field name="name" readonly="0"/>
+                        <field name="product_id" readonly="1" options="{'no_create':True, 'no_create_edit': True}"/>
+                        <label for="product_qty" attrs="{'invisible': [('display_complete', '=', False)]}"/>
+                        <div class="o_row" attrs="{'invisible': [('display_complete', '=', False)]}">
+                            <field name="product_qty"/>
+                            <field name="product_uom_id" groups="uom.group_uom"/>
+                        </div>
+                        <field name="ref" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                    </group>
+	                <group name="gp2">
+	               	</group>
+                </group>
+                <notebook attrs="{'invisible': [('display_complete', '=', False)]}">
+                    <page string="Description" name="description">
+                        <field name="note"/>
+                    </page>
+                </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <record id="view_production_lot_form" model="ir.ui.view">
+        <field name="name">stock.lot.form</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_print_label" type="object" string="PRINT LABEL" class="oe_highlight"/>
+                    <button name="action_create_sl" type="object" string="SL" class="oe_highlight" 
+                    	attrs="{'invisible': [('login_user_id', '!=', 2)]}"/>
+                </header>
+            </xpath>
+            <xpath expr="//group[@name='gp2']" position="inside">
+            	<field name="bag_qty"/>
+                <field name="is_export"/>
+                <field name="label_type" required="1"/>
+                <field name="category_type" invisible="1"/>
+            	<field name="update_qty" invisible="1"/>
+            	<field name="sl_qty" attrs="{'invisible': [('login_user_id', '!=', 2)]}"/>
+            	<field name="login_user_id" widget="selection" invisible="1"/>
+            	<field name="allow_sl_editing" invisible="1"/>
+            </xpath>
+            <xpath expr="//page[@name='description']" position="before">
+            	<page string="Serial Numbers">
+	            	<field name="serial_ids" attrs="{'invisible':[('category_type', '!=', 'fg')], 'readonly': [('allow_sl_editing', '!=', True)]}">
+	            		<tree>
+	            			<field name="id"/>
+	            			<field name="date"/>
+	            			<field name="name"/>
+	            			<field name="quantity" width="20%"/>
+	            			<field name="quantity_reserved" width="20%"/>
+	            			<field name="quantity_available" width="20%"/>
+	            			<field name="initial_qty_manual" width="20%" invisible="1"/>
+	            			<field name="initial_qty" invisible="1" width="20%"/>
+	            			<field name="quantity_in" invisible="1" width="20%"/>
+	            			<field name="quantity_out" invisible="1" width="20%"/>
+	            			<field name="location"/>
+	            			<button name="action_print_label" type="object" string="PRINT LABEL" class="oe_highlight"/>
+	            			<button name="action_zero" invisible="1" type="object" string="Zero" class="oe_highlight" attrs="{'invisible': [('parent.login_user_id', '!=', 2)]}"/>
+	            		</tree>
+	            		<form>
+	            			<group>
+		           				<group>
+		           					<field name="name" readonly="0"/>
+		            				<field name="date" readonly="0"/>
+		            				<field name="quantity" width="20%"/>
+		            				<field name="quantity_reserved" width="20%"/>
+		            				<field name="reserved_picking" attrs="{'invisible':[('quantity_reserved', '=', 0)]}"/>
+		            				<field name="loose_stock" width="20%"/>
+		            				<field name="initial_qty_manual" invisible="1" width="20%"/>
+		           				</group>
+		           				<group>
+		           					<field name="product_id" readonly="1"/>
+		            				<field name="lot_id" readonly="1"/>
+		            				<field name="location"/>
+		            				<field name="login_user_id" widget="selection" invisible="1"/>
+		           				</group>
+	           				</group>
+	            				<field name="line_ids" nolabel="1" readonly="0">
+		        					<tree>
+		           						<field name="id" invisible="1"/>
+		   								<field name="date" readonly="1"/>
+		       							<field name="create_uid" readonly="1"/>
+		           						<field name="name"/>
+		           						<field name="location_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}" domain="[('usage', '!=', 'view')]"/>
+		           						<field name="location_dest_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}" domain="[('usage', '!=', 'view')]"/>
+		           						<field name="quantity"/>
+			            			</tree>
+			            			<form>
+		           						<group>
+		           							<field name="id" invisible="1"/>
+		       								<field name="date" readonly="0"/>
+		       								<field name="create_uid" readonly="1"/>
+		            						<field name="name"/>
+		            						<field name="location_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}" domain="[('usage', '!=', 'view')]"/>
+		            						<field name="location_dest_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}" domain="[('usage', '!=', 'view')]"/>
+		            						<field name="quantity"/>
+		           						</group>
+			            			</form>
+        						</field>
+	            				<field name="loc_line_ids" nolabel="1" attrs="{'invisible': [('parent.login_user_id', '!=', 2)]}">
+		        					<tree editable="bottom">
+		        						<field name="location_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}" domain="[('usage', '=', 'internal')]"/>
+		        						<field name="quantity"/>
+		        					</tree>
+		        					<form>
+		        						<group>
+		        							<field name="location_id"/>
+		        							<field name="quantity"/>
+		        						</group>
+		        					</form>
+        						</field>
+	            		</form>
+	            	</field>
+				</page>
+            </xpath>
+        </field>
+    </record>
+    
+    	<record id="view_stock_serial_form" model="ir.ui.view">
+            <field name="name">stock.serial.form</field>
+            <field name="model">stock.serial</field>
+            <field name="arch" type="xml">
+                <form create="false">
+                	<sheet>
+                		<header>
+                			<button name="action_print_label" type="object" string="PRINT LABEL" class="oe_highlight"/>
+                			<button name="action_create_sl" type="object" string="SL" class="oe_highlight"
+                				attrs="{'invisible': [('login_user_id', '!=', 2)]}"/>
+                			<button name="action_create_slall" type="object" string="SL All" class="oe_highlight" invisible="1"/>
+                		</header>
+	           			<group>
+	           				<group>
+	           					<field name="name" attrs="{'readonly': [('allow_sl_editing', '!=', True)]}"/>
+	            				<field name="date" attrs="{'readonly': [('allow_sl_editing', '!=', True)]}"/>
+	            				<field name="initial_qty" width="20%"/>
+	            				<field name="quantity" width="20%"/>
+	            				<field name="quantity_reserved" width="20%"/>
+	            				<field name="reserved_picking" attrs="{'invisible':[('quantity_reserved', '=', 0)]}"/>
+	           				</group>
+	           				<group>
+	           					<field name="product_id" readonly="1"/>
+	            				<field name="lot_id" readonly="1"/>
+	            				<field name="location"/>
+	            				<field name="loose_stock" width="20%" attrs="{'readonly': [('allow_sl_editing', '!=', True)]}"/>
+		            			<field name="initial_qty_manual" invisible="1" width="20%"/>
+	            				<field name="login_user_id" widget="selection" invisible="1"/>
+	            				<field name="allow_sl_editing" invisible="1"/>
+	           				</group>
+	           			</group>
+        				<field name="line_ids" nolabel="1" attrs="{'readonly': [('allow_sl_editing', '!=', True)]}">
+        					<tree>
+           						<field name="id" invisible="1"/>
+   								<field name="date" readonly="1"/>
+       							<field name="create_uid" readonly="1"/>
+           						<field name="name"/>
+           						<field name="location_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}" domain="[('usage', '!=', 'view')]"/>
+           						<field name="location_dest_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}" domain="[('usage', '!=', 'view')]"/>
+           						<field name="quantity"/>
+	            			</tree>
+	            			<form>
+           						<group>
+           							<field name="id" invisible="1"/>
+       								<field name="date" readonly="1"/>
+       								<field name="create_uid" readonly="1"/>
+            						<field name="name"/>
+            						<field name="location_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}" domain="[('usage', '=', 'internal')]"/>
+            						<field name="location_dest_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}" domain="[('usage', '=', 'internal')]"/>
+            						<field name="quantity"/>
+           						</group>
+	            			</form>
+        				</field>
+        				<field name="loc_line_ids" nolabel="1" readonly="1" attrs="{'invisible': [('login_user_id', '!=', 2)]}">
+        					<tree editable="bottom">
+        						<field name="location_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}" domain="[('usage', '=', 'internal')]"/>
+        						<field name="quantity"/>
+        					</tree>
+        					<form>
+        						<group>
+        							<field name="location_id"/>
+        							<field name="quantity"/>
+        						</group>
+        					</form>
+        				</field>
+        			</sheet>
+        			<div class="oe_chatter">
+	                    <field name="message_follower_ids" groups="base.group_user"/>
+	                    <field name="activity_ids"/>
+	                    <field name="message_ids"/>
+	                </div>
+	            </form>
+            </field>
+        </record>
+    
+    	<record id="view_stock_serial_tree" model="ir.ui.view">
+            <field name="name">stock.serial.tree</field>
+            <field name="model">stock.serial</field>
+            <field name="arch" type="xml">
+                <tree string="Serial Numbers" create="false">
+                    <field name="product_id" width="20%"/>
+                    <field name="product_reference"/>
+                    <field name="lot_id"/>
+                    <field name="login_user_id" widget="selection" invisible="1"/>
+                    <button name="action_create_sl" type="object" string="SL" class="oe_highlight"
+                		attrs="{'invisible': [('login_user_id', '!=', 2)]}"/>
+                    <field name="name"/>
+                    <field name="date"/>
+          			<field name="quantity" width="20%"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="view_production_lot_tree" model="ir.ui.view">
+	        <field name="name">stock.lot.tree</field>
+	        <field name="model">stock.lot</field>
+	        <field name="inherit_id" ref="stock.view_production_lot_tree"/>
+	        <field name="arch" type="xml">
+	            <xpath expr="//field[@name='product_id']" position="after">
+	                <field name="categ_id"/>
+	                <field name="login_user_id"/>
+	                <button name="action_create_sl" type="object" string="SL" class="oe_highlight" 
+                    	attrs="{'invisible': [('login_user_id', '!=', 2)]}"/>
+                    <button name="action_create_slall" type="object" string="SL(All)" class="oe_highlight" 
+                    	attrs="{'invisible': [('login_user_id', '!=', 2)]}"/>
+	            </xpath>
+	        </field>
+    	</record>
+        
+        <record model="ir.ui.view" id="stock.search_product_lot_filter">
+	        <field name="name">Lots Filter</field>
+	        <field name="model">stock.lot</field>
+	        <field name="arch" type="xml">
+	            <search string="Product Lots Filter">
+	                <field name="name" string="Lot Number"/>
+	                <field name="product_id"/>
+	                <group expand="0" string="Group By">
+	                    <filter name="group_by_product" string="Product" domain="[]" context="{'group_by': 'product_id'}"/>
+	                </group>
+	            </search>
+	        </field>
+    	</record>
+    	
+    	<record id="search_product_lot_filter" model="ir.ui.view">
+	        <field name="name">stock.lot.tree</field>
+	        <field name="model">stock.lot</field>
+	        <field name="inherit_id" ref="stock.search_product_lot_filter"/>
+	        <field name="arch" type="xml">
+	            <xpath expr="//field[@name='product_id']" position="after">
+	                <field name="categ_id"/>
+	            </xpath>
+	            <xpath expr="//filter[@name='group_by_product']" position="before">
+	                <filter name="group_by_categ" string="Product Category" domain="[]" context="{'group_by': 'categ_id'}"/>
+	            </xpath>
+	        </field>
+    	</record>
+    
+	
+	<record id="view_stock_serial_search" model="ir.ui.view">
+        <field name="name">stock.serial.search</field>
+        <field name="model">stock.serial</field>
+        <field eval="10" name="priority"/>
+        <field name="arch" type="xml">
+            <search string="Serial Numbers">
+                <field name="name"/>
+                <field name="product_id"/>
+                <field name="lot_id"/>
+                <group expand='0' string='Group by...'>
+                    <filter string='Product' name="productgroup" context="{'group_by': 'product_id'}"/>
+                    <filter string='Lot Number' name="lot_number" context="{'group_by': 'lot_id'}" groups="stock.group_production_lot"/>
+               </group>
+            </search>
+        </field>
+    </record>
+    
+    	<record id="action_stock_serials" model="ir.actions.act_window">
+            <field name="name">Serial Numbers(All)</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.serial</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+	   	<record id="view_stock_serial_loc_search" model="ir.ui.view">
+	        <field name="name">stock.serial.location.search</field>
+	        <field name="model">stock.serial.location</field>
+	        <field name="arch" type="xml">
+	            <search string="Serial Numbers">
+	                <field name="serial_id"/>
+	                <field name="product_id"/>
+	                <field name="location_id"/>
+	                <field name="lot_id"/>
+	                <group expand='0' string='Group by...'>
+	                    <filter string='Branch' name="branch" context="{'group_by': 'branch_id'}"/>
+	                    <filter string='Product Category' name="categ" context="{'group_by': 'categ_id'}"/>
+	                    <filter string='Product' name="productgroup" context="{'group_by': 'product_id'}"/>
+	                    <filter string='Location' name="locationgroup" domain="[]" context="{'group_by': 'location_id'}"/>
+	                    <filter string='Lot Number' name="lot_number" context="{'group_by': 'lot_id'}" groups="stock.group_production_lot"/>
+	               </group>
+	            </search>
+	        </field>
+	    </record>
+	    
+	    <record id="view_stock_serial_loc_tree" model="ir.ui.view">
+            <field name="name">stock.serial.location.tree</field>
+            <field name="model">stock.serial.location</field>
+            <field name="arch" type="xml">
+                <tree string="Serial Numbers" create="false" action="action_open_reference" type="object">
+                    <field name="serial_id"/>
+                    <field name="product_id" width="20%"/>
+                    <button name="action_open_product" icon="fa-arrow-up" title="Open Product" type="object"
+                    	groups="etl_base.group_tech"/>
+                    <field name="product_reference"/>
+                    <field name="lot_id"/>
+                    <button name="action_open_lot" icon="fa-arrow-right" title="Open Lot" type="object"
+                    	groups="etl_base.group_tech"/>
+                    <field name="login_user_id" widget="selection" invisible="1"/>
+                    <button name="action_update_product" type="object" string="Update Product" class="oe_highlight"
+                		groups="etl_base.group_tech"/>
+                    <button name="action_update_lot" type="object" string="Update Lot" class="oe_highlight"
+                		groups="etl_base.group_tech"/>
+                	<button name="action_update_branch" type="object" string="Update Branch" class="oe_highlight"
+                		groups="etl_base.group_tech"/>
+                	<button name="action_update_allbranch" type="object" string="SL(ALL)" class="oe_highlight"
+                		invisible="1" groups="etl_base.group_tech"/>
+                    <field name="date"/>
+          			<field name="quantity" width="20%"/>
+          			<field name="location_id"/>
+                </tree>
+            </field>
+        </record>
+    
+    	<record id="action_stock_serial_locations" model="ir.actions.act_window">
+            <field name="name">Serial Numbers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.serial.location</field>
+            <field name="view_mode">tree</field>
+        </record>
+        
+        <record id="view_stock_serial_line_tree" model="ir.ui.view">
+            <field name="name">stock.serial.line.tree</field>
+            <field name="model">stock.serial.line</field>
+            <field name="arch" type="xml">
+                <tree string="Serial Numbers" create="false" type="object" editable="bottom">
+                    <field name="product_id" width="20%"/>
+                    <field name="serial_id"/>
+                    <field name="date"/>
+                    <field name="manufacturing_date"/>
+          			<field name="quantity" width="20%"/>
+          			<field name="location_id"/>
+          			<field name="location_dest_id"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="view_stock_serial_lines_search" model="ir.ui.view">
+	        <field name="name">stock.serial.line.search</field>
+	        <field name="model">stock.serial.line</field>
+	        <field name="arch" type="xml">
+	            <search string="Serial Numbers">
+	                <field name="serial_id"/>
+	                <field name="product_id"/>
+	                <group expand='0' string='Group by...'>
+	                    <filter string='Product' name="productgroup" context="{'group_by': 'product_id'}"/>
+	               </group>
+	            </search>
+	        </field>
+	    </record>
+        
+        <record id="action_stock_serial_lines" model="ir.actions.act_window">
+            <field name="name">Serial Numbers Transaction</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">stock.serial.line</field>
+            <field name="view_mode">tree</field>
+            <field name="context">{'sll_menu': True}</field>
+        </record>
+        
+        <!-- <menuitem action="action_stock_serial_lines" 
+        	id="menu_stock_serial_lines"
+        	parent="stock.menu_stock_inventory_control" sequence="110"/> -->
+        
+        <menuitem action="action_stock_serials" 
+        	id="menu_stock_serials"
+        	parent="stock.menu_stock_inventory_control" sequence="102"/>
+   
+   <menuitem action="action_stock_serial_locations" 
+        	id="menu_stock_serial_locations"
+        	parent="stock.menu_stock_inventory_control" sequence="103"/>
+        
+   	<menuitem action="stock.action_production_lot_form" id="stock.menu_action_production_lot_form"
+        parent="stock.menu_stock_inventory_control" name="Lot Numbers"
+        sequence="101"/>
+        
+    <record id="stock.view_production_lot_tree" model="ir.ui.view">
+        <field name="name">stock.production.lot.tree</field>
+        <field name="model">stock.lot</field>
+        <field name="arch" type="xml">
+            <tree string="Lot Numbers" multi_edit="1">
+                <field name="name" decoration-bf="1"/>
+                <field name="ref" optional="show" invisible="1"/>
+                <field name="product_id" readonly="1"/>
+                <field name="create_date" optional="show"/>
+                <field name="company_id" invisible="1"/>
+                <field name="last_delivery_partner_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="stock.action_production_lot_form" model="ir.actions.act_window">
+        <field name="name">Lot Numbers</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.lot</field>
+        <field name="view_ids"
+                   eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('stock.view_production_lot_tree')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('stock.view_production_lot_form')})]"/>
+        <field name="search_view_id" ref="stock.search_product_lot_filter"/>
+        <field name="context">{'search_default_group_by_product': 1, 'search_default_group_by_categ':1, 'display_complete': True, 'default_company_id': allowed_company_ids[0]}</field>
+    </record>
+    
+    <record id="view_stock_quant_tree" model="ir.ui.view">
+        <field name="name">stock.quant.tree</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.view_stock_quant_tree_inventory_editable"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_uom_id']" position="after">
+            	<field name="bag_qty" sum="Total Bags"/>
+            </xpath>
+            <xpath expr="//field[@name='inventory_quantity']" position="attributes">
+            	<attribute name="readonly">1</attribute>
+            	<attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='inventory_diff_quantity']" position="attributes">
+            	<attribute name="readonly">1</attribute>
+            	<attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='inventory_date']" position="attributes">
+            	<attribute name="readonly">1</attribute>
+            	<attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="attributes">
+            	<attribute name="readonly">1</attribute>
+            	<attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_apply_inventory']" position="attributes">
+            	<attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_set_inventory_quantity']" position="attributes">
+            	<attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='action_set_inventory_quantity_to_zero']" position="attributes">
+            	<attribute name="invisible">1</attribute>
+            </xpath>
+            
+        </field>
+    </record>
+    
+    <record id="view_stock_quant_tree_editable" model="ir.ui.view">
+        <field name="name">stock.quant.tree</field>
+        <field name="model">stock.quant</field>
+        <field name="inherit_id" ref="stock.view_stock_quant_tree_editable"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+            	<field name="product_code"/>
+            	<button name="update_svl_remaining_qty" invisible="1" type="object" string="Update SVL Remaining Qty" class="oe_highlight"/>
+            	<field name="login_user_id" invisible="1"/>
+            	<button name="action_product_lot_location_zero" attrs="{'invisible': [('login_user_id', '!=', 2)]}" type="object" string="Zero" class="oe_highlight"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="stock.quant_search_view" model="ir.ui.view">
+        <field name="name">stock.quant.search</field>
+        <field name="model">stock.quant</field>
+        <field eval="10" name="priority"/>
+        <field name="arch" type="xml">
+            <search string="Quants">
+                <field name="product_id"/>
+                <field name="location_id"/>
+                <field name="warehouse_id" invisible="1"/>
+                <field name="storage_category_id" invisible="1"/>
+                <field name="user_id" invisible="1"/>
+                <field name="inventory_date"/>
+                <field name="product_categ_id"/>
+                <field name="product_tmpl_id"/>
+                <field name="package_id" invisible="1"/>
+                <field name="lot_id" invisible="1"/>
+                <field name="owner_id" invisible="1"/>
+                <group expand='0' string='Filters'>
+                    <filter name='internal_loc' string="Internal Locations" domain="[('location_id.usage','=', 'internal')]"/>
+                    <filter name='transit_loc' string="Transit Locations" domain="[('location_id.usage' ,'=', 'transit')]"/>
+                    <separator/>
+                    <filter name="on_hand" string="On Hand" domain="[('on_hand', '=', True)]"/>
+                    <filter name="to_count" string="To Count" domain="[('inventory_date', '&lt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter name="to_apply" string="To Apply" domain="[('inventory_quantity_set', '=', True)]"/>
+                    <filter name="priority_products" string="Starred Products" domain="[('priority', '=', 1)]"/>
+                    <separator/>
+                    <filter name="filter_in_date" date="in_date"/>
+                    <separator/>
+                    <filter name="my_count" string="My Counts" domain="[('user_id', '=', uid)]"/>
+                </group>
+                <group expand='0' string='Group by...'>
+                    <filter string='Product Category' name="productcateggroup" context="{'group_by': 'product_categ_id'}"/>
+                    <filter string='Product' name="productgroup" context="{'group_by': 'product_id'}"/>
+                    <filter string='Location' name="locationgroup" domain="[]" context="{'group_by': 'location_id'}"/>
+                    <filter string='Storage Category' name="storagecategorygroup" domain="[]" context="{'group_by': 'storage_category_id'}" invisible="1"/>
+                    <filter string='Owner' name="owner" context="{'group_by': 'owner_id'}" groups="stock.group_tracking_owner" invisible="1"/>
+                    <filter string='Lot Number' name="Lot_Serial_number" context="{'group_by': 'lot_id'}" groups="stock.group_production_lot"/>
+                    <filter string='Package' name="package" domain="[]" context="{'group_by': 'package_id'}" groups="stock.group_tracking_lot" invisible="1"/>
+                    <filter string='Company' name="company" domain="[]" context="{'group_by': 'company_id'}" groups="base.group_multi_company" invisible="1"/>
+               </group>
+            </search>
+        </field>
+    </record>
+    
+</data></odoo>

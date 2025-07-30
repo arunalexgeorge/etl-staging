@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="sequence_customer" model="ir.sequence">
+            <field name="name">Customer Code(Domestic)</field>
+            <field name="code">customer.domestic</field>
+            <field name="prefix">CD</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="company_id"></field>
+        </record>
+        
+        <record id="sequence_customer_export" model="ir.sequence">
+            <field name="name">Customer Code(Export)</field>
+            <field name="code">customer.export</field>
+            <field name="prefix">CE</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="company_id"></field>
+        </record>
+        
+        <record id="sequence_vendor" model="ir.sequence">
+            <field name="name">Vendor Code(Domestic)</field>
+            <field name="code">vendor.domestic</field>
+            <field name="prefix">VD</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="company_id"></field>
+        </record>
+        
+        <record id="sequence_vendor_foreign" model="ir.sequence">
+            <field name="name">Vendor Code(Foreign)</field>
+            <field name="code">vendor.foreign</field>
+            <field name="prefix">VF</field>
+            <field name="padding">5</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+            <field name="company_id"></field>
+        </record>
+
+
+    </data>
+</odoo>

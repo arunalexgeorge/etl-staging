@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="view_partner_ledger_form" model="ir.ui.view">
+            <field name="name">Partner Ledger</field>
+            <field name="model">partner.ledger</field>
+            <field name="arch" type="xml">
+                <form string="Partner Ledger" create="false">
+                	<group>
+                    	<button name="action_print" string="Print" data-hotkey="q"
+                            colspan="1" type="object" class="btn-primary"/>
+                    </group>
+                    <group>
+                    	<group>
+                    		<field name="partner_id" required="1" context="{'show_city': True}"
+                    			options="{'no_edit_create': True, 'no_create': True}"/>
+                    		<field name="start_date" required="1"/>
+                    		<field name="end_date" required="1"/>
+                    		<field name="type" required="1"/>
+                    	</group>
+                    	<group>
+                    		<field name="branch_ids" required="1" widget="many2many_tags"
+                    			options="{'no_edit_create': True, 'no_create': True}"/>
+                    		<field name="opening_balance" readonly="1" force_save="1"/>
+                    		<field name="closing_balance" readonly="1" force_save="1"/>
+                    	</group>
+                    </group>
+                 	<field name="line_ids" nolabel="1">
+                  		<tree create="false" delete="false" editable="bottom">
+                  			<field name="month" width="10%" force_save="1" attrs="{'column_invisible': [('parent.type', '!=', 'monthly')]}"/>
+                  			<field name="date" width="10%" force_save="1" attrs="{'column_invisible': [('parent.type', '=', 'monthly')]}"/>
+                  			<field name="name" width="30%" force_save="1" attrs="{'column_invisible': [('parent.type', '!=', 'ledger')]}"/>
+                  			<field name="voucher_type" force_save="1" width="15%" attrs="{'column_invisible': [('parent.type', '!=', 'ledger')]}"/>
+                  			<field name="move_id" force_save="1" widget="many2one" width="10%" attrs="{'column_invisible': [('parent.type', '=', 'monthly')]}"/>
+                  			<field name="debit" force_save="1" width="10%" sum="Total Debit" attrs="{'column_invisible': [('parent.type', '=', 'overdue')]}"/>
+                  			<field name="credit" force_save="1" width="10%" sum="Total Credit" attrs="{'column_invisible': [('parent.type', '=', 'overdue')]}"/>
+                  			<field name="closing_balance" readonly="1"  force_save="1" width="10%" attrs="{'column_invisible': [('parent.type', '!=', 'monthly')]}"/>
+                  			<field name="opening_amount" force_save="1" width="10%" sum="Total Opening" attrs="{'column_invisible': [('parent.type', '!=', 'overdue')]}"/>
+                  			<field name="pending_amount" force_save="1" width="10%" sum="Total Pending" attrs="{'column_invisible': [('parent.type', '!=', 'overdue')]}"/>
+                  			
+                  			<field name="due_date" force_save="1" width="10%" attrs="{'column_invisible': [('parent.type', '!=', 'overdue')]}"/>
+                  			<field name="due_days" force_save="1" width="10%" attrs="{'column_invisible': [('parent.type', '!=', 'overdue')]}"/>
+                  			<field name="move_line_id" force_save="1" invisible="1"/>
+                  		</tree>
+               		</field>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_partner_ledger" model="ir.actions.act_window">
+            <field name="name">Partner Ledger</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">partner.ledger</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
+       
+       <menuitem id="menu_action_partner_ledger" 
+       		parent="account.menu_finance_entries_actions" 
+       		action="action_partner_ledger" sequence="106"/>
+       
+    </data>
+</odoo>    

@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data>
+    
+    <record id="view_picking_form" model="ir.ui.view">
+        <field name="name">stock.picking.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='extra']" position="before">
+                <page string="Transport Details">
+                    <group>
+                        <group>
+                            <field name="transport_mode"/>
+                            <field name="transport_company"/>
+                        </group>
+                        <group>
+                            <field name="vehicle_no"/>
+                            <field name="dispatch_date"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='origin']" position="after">
+            	<field name="remarks"/>
+            	<field name="invoiced" invisible="1"/>
+            	<field name="sale_invoice_id" invisible="1"/>
+            	<field name="billed" invisible="1"/>
+            	<field name="purchase_bill_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='move_ids_without_package']/tree//field[@name='product_id']" position="before">
+            	<field name="sl_no"/>
+            </xpath>
+            <xpath expr="//field[@name='move_ids_without_package']/tree//field[@name='product_id']" position="after">
+            	<field name="alt_uom_id" readonly="0" attrs="{'column_invisible': [('parent.picking_inbranch', '!=', True),('parent.picking_delivery', '!=', True)]}"
+            		options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+            	<field name="alt_uom_qty" sum="Total" readonly="0" attrs="{'column_invisible': [('parent.picking_inbranch', '!=', True),('parent.picking_delivery', '!=', True)]}"/>
+            	<field name="alt_uom_qty_reserved" sum="Total" readonly="1" attrs="{'column_invisible': [('parent.picking_delivery', '!=', True)]}"/>
+            	<field name="alt_uom_qty_actual" sum="Total" readonly="0" attrs="{'column_invisible': [('parent.picking_inbranch', '!=', True),('parent.picking_delivery', '!=', True)]}"/>
+            	<button name="create_bt_move" class="oe_highlight" string="Create BTM" type="object" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='move_ids_without_package']/tree//field[@name='quantity_done']" position="after">
+            	<field name="price_unit" readonly="1" string="Unit Cost" attrs="{'column_invisible': [('parent.branch_tranfser', '!=', True)]}"/>
+            	<field name="total_cost" readonly="1" sum="Total" attrs="{'column_invisible': [('parent.branch_tranfser', '!=', True)]}"/>
+            </xpath>
+            <xpath expr="//field[@name='move_ids_without_package']/tree//field[@name='product_uom']" position="after">
+            	<field name="category_type" invisible="1"/>
+            	<button name="action_print_rm_label" type="object" string="PRINT LABEL" class="oe_highlight"
+            		attrs="{'invisible': ['|','|',('parent.state', '!=', 'done'),('category_type', '!=', 'rm'),('has_tracking', '!=','lot')]}"/>
+            </xpath>
+            <xpath expr="//button[@name='action_assign']" position="attributes">
+            	<attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_validate']" position="before">
+            	<button name="action_assign_picking" class="oe_highlight" 
+            		attrs="{'invisible': ['|', ('state', 'not in', ('assigned','waiting','confirmed')), ('picking_delivery', '!=', True)]}" 
+            		string="Check Availability" type="object"/>
+            	<button name="action_check_availability_inbranch" class="oe_highlight" 
+            		attrs="{'invisible': ['|', ('state', 'not in', ('assigned','confirmed')), ('picking_inbranch', '!=', True)]}" 
+            		string="Check Availability" type="object"/>
+            	<button name="button_validate_reserve" class="oe_highlight" attrs="{'invisible': ['|', ('state', '!=', 'assigned'), ('picking_delivery', '!=', True)]}" string="Validate Reserve" type="object"/>
+            	<button id="create_sales_invoice" name="create_st_invoice" string="Create Invoice"
+                    type="object" class="oe_highlight"
+                    attrs="{'invisible': ['|','|',('invoiced', '=', True), ('so_type', '!=', 'stock'), ('state', '!=', 'done')]}"/>
+                <button id="create_purchase_invoice" name="create_st_bill" string="Create Bill"
+                    type="object" class="oe_highlight"
+                    attrs="{'invisible': ['|','|',('billed', '=', True), ('po_type', '!=', 'stock'), ('state', '!=', 'done')]}"/>
+            </xpath>
+            <xpath expr="//field[@name='move_ids_without_package']/tree//field[@name='quantity_done']" position="attributes">
+            	<attribute name="sum">Total Weight</attribute>
+            </xpath>
+            <xpath expr="//field[@name='backorder_id']" position="after">
+            	<field name="serial_number" attrs="{'invisible': ['|', ('state', 'in', ('done', 'cancel')), ('picking_inbranch', '!=', True),('picking_delivery', '!=', True)], 'readonly': [('state', 'in', ('cancel', 'done'))]}"/>
+            	<field name="picking_delivery" invisible="1"/>
+            	<field name="branch_tranfser" invisible="1"/>
+            	<field name="picking_inbranch" invisible="1"/>
+            	<field name="so_type" invisible="1"/>
+            	<field name="sale_order_id" invisible="1"/>
+            	<field name="po_type" invisible="1"/>
+            	<field name="purchase_order_id" invisible="1"/>
+            	<field name="branch_return" attrs="{'invisible': [('picking_inbranch', '!=', True)], 'readonly': [('state', 'in', ('cancel', 'done'))]}"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+	            <button name="action_view_invoice" type="object"
+                        class="oe_stat_button" string="Invoice"
+                        icon="fa-pencil-square-o"
+                        attrs="{'invisible': [('invoiced', '!=', True)]}">
+               	</button>
+               	<button name="action_view_bill" type="object"
+                        class="oe_stat_button" string="Bill"
+                        icon="fa-pencil-square-o"
+                        attrs="{'invisible': [('billed', '!=', True)]}">
+               	</button>
+            </xpath>
+            <xpath expr="//page[@name='operations']" position="after">
+            	<page string="Serial Numbers">
+  					<button name="action_correction" class="oe_highlight" string="Correction" type="object" invisible="1"/>
+  					<field  nolabel="1" name="serial_line_ids" attrs="{'readonly': [('state', '=', 'done')]}">
+	          			<tree editable="bottom" create="1" decoration-success="scanned == True">
+		           			<field name="serial_id" required="1" options="{'no_create_edit':True, 'no_create':True}"/>
+		           			<field name="serial_line_out_id" invisible="1" options="{'no_create_edit':True, 'no_create':True}"/>
+		           			<field name="name" invisible="1"/>
+		           			<field name="lot_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+		           			<field name="product_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+		           			<field name="alt_uom_id" readonly="0" options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+		           			<field name="scanned" force_save="1" readonly="0" invisible="0"/>
+		           			<field name="quantity" width="20%" sum="Total Weight"/>
+		           			<field name="reserved" width="20%" invisible="1"/>
+		           		</tree>	
+		           		<form>
+		           			<group>
+		           				<field name="serial_id"/>
+		           				<field name="lot_id"/>
+		            			<field name="quantity" width="20%"/>
+		           			</group>
+		           		</form>
+       				</field>
+       				<group>
+            			<field name="scanned_list_count"/>
+            			<field name="sn_list_count"/>
+            		</group>
+            	</page>
+            	<page string="Weight Details">
+            		<group>
+            			<group string="PCTR">
+            				<field name="pctr_bag" string="BAG"/>
+            				<field name="pctr_belt" string="BELT"/>
+            				<field name="pctr_weight" string="WEIGHT"/>
+            			</group>
+            			<group string="BG">
+            				<field name="bg_box" string="BOX"/>
+            				<field name="bg_bag" string="BAG"/>
+            				<field name="bg_roll" string="ROLL"/>
+            				<field name="bg_weight" string="WEIGHT"/>
+            			</group>
+            			<group string="BVC">
+            				<field name="bvc_drum" string="DRUM"/>
+            				<field name="bvc_can" string="CAN"/>
+            				<field name="bvc_ltr" string="LTR"/>
+            				<field name="bvc_weight" string="WEIGHT"/>
+            			</group>
+            			<group string="CT">
+            				<field name="ct_bag" string="BAG"/>
+            				<field name="ct_belt" string="BELT"/>
+            				<field name="ct_weight" string="WEIGHT"/>
+            			</group>
+            		</group>
+            	</page>
+            	<page string="Scanned List" invisible="1" groups="etl_base.group_tech">
+        				<group>
+        					<field name="scanned_list" force_save="1"/>
+        					<field name="sn_list" force_save="1"/>
+        					<field name="login_user_id" invisible="1"/>
+        					<field name="branch_received" invisible="0" readonly="0"/>
+        					<field name="dn_ref" invisible="0" readonly="1"/>
+        				</group>
+        				<button name="update_done_quantity" invisible="1" class="oe_highlight" string="Update Done Qty" type="object"/>
+        				<button name="create_branch_transit_move" invisible="1" class="oe_highlight" string="BTM" type="object"/>
+        				<button name="update_sales_price" invisible="0" class="oe_highlight" string="BTM-DN Cost" type="object"/>
+        				<button name="update_unit_cost_grn" invisible="0" class="oe_highlight" string="BTM-GRN Cost" type="object"/>
+        				<button name="update_svl_grn" invisible="0" class="oe_highlight" string="BTM-GRN SVL" type="object"/>
+            	</page>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="view_picking_type_form" model="ir.ui.view">
+        <field name="name">stock.picking.type.form</field>
+        <field name="model">stock.picking.type</field>
+        <field name="inherit_id" ref="stock.view_picking_type_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='show_reserved']" position="after">
+            	<field name="quality_check"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="view_stock_move_operations" model="ir.ui.view">
+        <field name="name">stock.move.form</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_stock_move_operations"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='picking_type_id']" position="after">
+            	<field name="picking_delivery" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+    
+    	<record id="view_stock_serial_tree" model="ir.ui.view">
+            <field name="name">stock.serial.tree</field>
+            <field name="model">stock.serial</field>
+            <field name="arch" type="xml">
+                <tree string="Serial Numbers">
+                    <field name="name"/>
+                    <field name="lot_id"/>
+                    <field name="product_id"/>
+                    <field name="quantity"/>
+                </tree>
+            </field>
+        </record>
+   
+   <record id="view_inventory_updation_form" model="ir.ui.view">
+            <field name="name">inventory.updation.form</field>
+            <field name="model">inventory.updation</field>
+            <field name="arch" type="xml">
+                <form string="Inventory Updation">
+                    <header>
+	                    <field name="state" widget="statusbar"/>
+	                    <button name="action_update_sn" string="Update Serial Numbers" type="object" 
+	                    	attrs="{'invisible': ['|', ('categ', '!=', 'fg'), ('sn_updated', '=', True)]}"/>
+	                    <button name="action_update_stock" string="Update Stock" type="object"
+	                    	attrs="{'invisible': ['|', ('state', '=', 'done'), '&amp;', ('categ', '=', 'fg'), ('sn_updated', '!=', True)]}"/>
+               		</header>
+               		<sheet>
+               			<group>
+	               			<group>
+	               				<field name="location_id" required="1" options="{'no_create_edit':True, 'no_create':True,'no_open': True}" domain="[('usage', '=', 'internal')]" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+	               				<field name="branch_id" required="1" context="{'current_branch':True}" options="{'no_create_edit':True, 'no_create':True,'no_open': True}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+	               				<field name="categ" required="1" options="{'no_create_edit':True, 'no_create':True,'no_open': True}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+	               				<field name="stock_updated" readonly="1"/>
+	               			</group>
+	                        <group>
+	                            <field name="data_file"  attrs="{'readonly': [('state', '!=', 'draft')]}" filename="data_file_name"/>
+	            				<field name="data_file_name" invisible="1"/>
+	                            <field name="date" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}" />
+	                            <field name="sn_updated" string="SN Updated" readonly="1"/>
+	                        </group>
+                        </group>
+                    </sheet>
+                    <div class="o_attachment_preview"/>
+	                <div class="oe_chatter">
+	                    <field name="message_follower_ids" groups="base.group_user"/>
+	                    <field name="activity_ids"/>
+	                    <field name="message_ids"/>
+	                </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_inventory_updation_tree" model="ir.ui.view">
+            <field name="name">inventory.updation.tree</field>
+            <field name="model">inventory.updation</field>
+            <field name="arch" type="xml">
+                <tree string="Inventory Updation">
+                    <field name="location_id"/>
+                    <field name="branch_id"/>
+                    <field name="date"/>
+                    <field name="create_date"/>
+                    <field name="write_date"/>
+                    <field name="create_uid"/>
+                    <field name="write_uid"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_inventory_updation" model="ir.actions.act_window">
+            <field name="name">Inventory Updation</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">inventory.updation</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+    
+    	<menuitem id="menu_inventory_updation" parent="stock.menu_stock_warehouse_mgmt" action="action_inventory_updation" sequence="100"/>
+    	
+    <record id="stock_account.stock_valuation_layer_tree" model="ir.ui.view">
+        <field name="name">stock.valuation.layer.tree</field>
+        <field name="model">stock.valuation.layer</field>
+        <field name="arch" type="xml">
+            <tree default_order="id desc" create="0"
+                  import="0" js_class="inventory_report_list"
+                  action="action_open_reference" type="object">
+                <field name="create_date" readonly="1"/>
+                <field name="reference" readonly="1"/>
+                <button name="action_open_layer" icon="fa-arrow-right" title="Open Valuation Layer" type="object"/>
+                <field name="product_id" readonly="1"/>
+                <field name="company_id" invisible="1"/>
+                <field name="quantity" string="Moved Quantity" readonly="1"/>
+                <field name="unit_cost" />
+                <field name="uom_id" groups="uom.group_uom" />
+                <field name="currency_id" invisible="1" />
+                <field name="value" sum="Total Value" readonly="1"/>
+                <groupby name="product_id">
+                    <field name="cost_method" invisible="1"/>
+                    <field name="quantity_svl" invisible="1"/>
+                    <button name="action_revaluation" icon="fa-plus" title="Add Manual Valuation" type="object" invisible="1" />
+                </groupby>
+            </tree>
+        </field>
+    </record>
+    
+    <record id="view_stock_move_line_operation_tree" model="ir.ui.view">
+        <field name="name">stock.move.line.tree</field>
+        <field name="model">stock.move.line</field>
+        <field name="inherit_id" ref="stock.view_stock_move_line_operation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='qty_done']" position="after">
+            	<field name="unit_cost" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="stock_valuation_layer_tree" model="ir.ui.view">
+        <field name="name">stock.valuation.layer.tree</field>
+        <field name="model">stock.valuation.layer</field>
+        <field name="inherit_id" ref="stock_account.stock_valuation_layer_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='create_date']" position="before">
+            	<header>
+                  	<button name="correct_to_pickingdate" invisible="1" string="Correct To Picking Date" type="object" groups="etl_base.group_tech"/>
+                  	<button name="delete_svl_sm_am" invisible="1" string="Delete Svl SM AM" type="object" groups="etl_base.group_tech"/>
+                  	<button name="delete_svl_am" invisible="1" string="Delete Svl AM" type="object" groups="etl_base.group_tech"/>
+                  	<button name="correct_svl_jv" invisible="1" string="Correct Svl JV" type="object" groups="etl_base.group_tech"/>
+                  	<button name="update_move_line" invisible="1" string="Update Move Line" type="object" groups="etl_base.group_tech"/>
+                  	<button name="check_valuation_jv" invisible="1" string="Check Svl JV" type="object"/>
+            		<button name="update_cost_correct_svl" invisible="1" string="Correct Cost" type="object" groups="etl_base.group_tech"/>
+                </header>
+            </xpath>
+            <xpath expr="//field[@name='product_id']" position="after">
+            	<field name="location_id"/>
+            	<field name="location_dest_id"/>
+            	<field name="lot_ids" widget="many2many_tags" invisible="1" groups="etl_base.group_tech"/>
+            	<field name="remaining_qty" invisible="1"/>
+            	<field name="remaining_value" invisible="1"/>
+            	<field name="move_line_id" invisible="1" groups="etl_base.group_tech"/>
+            	<field name="lot_id"/>
+            	<field name="login_user_id" invisible="1"/>
+            	<field name="sm_id" invisible="1" groups="etl_base.group_tech"/>
+            	<field name="sm_qty" invisible="1" groups="etl_base.group_tech"/>
+            	<field name="sml_ids" invisible="1" groups="etl_base.group_tech"/>
+            	<field name="sml_id" invisible="1" groups="etl_base.group_tech"/>
+            </xpath>
+            <xpath expr="//field[@name='unit_cost']" position="after">
+            	<field name="up" invisible="1" groups="etl_base.group_tech"/>
+            	<button name="update_sml_cost" invisible="1" string="Update SML" type="object" groups="etl_base.group_tech"/>
+            	<button name="correct_svl_jv" invisible="1" string="Update JV" type="object" groups="etl_base.group_tech"/>
+            	<button name="update_cost_correct_svl" invisible="1" string="Correct Cost" type="object" groups="etl_base.group_tech"/>
+            	<button name="update_mrp_svl" invisible="1" string="Correct MRP Cost" type="object" groups="etl_base.group_tech"/>
+            	<button name="correct_to_smldate" invisible="1" string="SML DATE" type="object" groups="etl_base.group_tech"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="stock_account.view_inventory_valuation_search" model="ir.ui.view">
+        <field name="name">Valuation</field>
+        <field name="model">stock.valuation.layer</field>
+        <field name="arch" type="xml">
+            <search string="Inventory Valuation">
+                <field name="product_id"/>
+                <field name="categ_id" />
+                <field name="product_tmpl_id" invisible="1"/>
+                <separator/>
+                <filter string="Incoming" name="incoming" domain="[('stock_move_id.location_id.usage', 'not in', ('internal', 'transit')), ('stock_move_id.location_dest_id.usage', 'in', ('internal', 'transit'))]"/>
+                <filter string="Outgoing" name="outgoing" domain="[('stock_move_id.location_id.usage', 'in', ('internal', 'transit')), ('stock_move_id.location_dest_id.usage', 'not in', ('internal', 'transit'))]"/>
+                <separator/>
+                <filter string="Has Remaining Qty" name="has_remaining_qty" domain="[('remaining_qty', '>', 0)]"/>
+                <group expand='0' string='Group by...'>
+                    <filter string='Product' name="group_by_product_id" context="{'group_by': 'product_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <record id="stock_valuation_layer_search" model="ir.ui.view">
+        <field name="name">stock.valuation.layer.tree</field>
+        <field name="model">stock.valuation.layer</field>
+        <field name="inherit_id" ref="stock_account.view_inventory_valuation_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_tmpl_id']" position="after">
+            	<field name="reference"/>
+            	<separator/>
+            	<filter string="FG" name="fg" domain="[('category_type', '=', 'fg')]"/>
+                <filter string="SFG" name="sfg" domain="[('category_type', '=', 'sfg')]"/>
+                <filter string="RM" name="rm" domain="[('category_type', '=', 'rm')]"/>
+                <filter string="Scrap" name="rm" domain="[('category_type', '=', 'scrap')]"/>
+                <separator/>
+                <filter string="BG" name="fg" domain="[('fg_type', '=', 'bg')]"/>
+            	<filter string="BVC" name="fg" domain="[('fg_type', '=', 'bvc')]"/>
+            	<filter string="CT" name="fg" domain="[('fg_type', '=', 'ct')]"/>
+            	<filter string="PCTR" name="fg" domain="[('fg_type', '=', 'pctr')]"/>
+            </xpath>
+            <xpath expr="//filter[@name='has_remaining_qty']" position="before">
+            	<filter string='Category Type' name="group_by_categ_type" context="{'group_by': 'category_type'}"/>
+            	<filter string='Category' name="group_by_categ" context="{'group_by': 'product_categ_id'}"/>
+            	<filter string='Lot' name="group_by_lot" context="{'group_by': 'lot_id'}"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="stock_account.stock_valuation_layer_form" model="ir.ui.view">
+        <field name="name">stock.valuation.layer.form</field>
+        <field name="model">stock.valuation.layer</field>
+        <field name="arch" type="xml">
+            <form edit="0" create="0">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="create_date" string="Date" />
+                            <field name="product_id" />
+                            <field name="stock_move_id" attrs="{'invisible': [('stock_move_id', '=', False)]}" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Valuation" name="valuation">
+                            <group name="gp1">
+                                <field name="quantity" />
+                                <field name="uom_id" groups="uom.group_uom" />
+                                <field name="currency_id" invisible="1" />
+                                <field name="unit_cost" />
+                                <field name="value" />
+                                <field name="remaining_qty"/>
+                            </group>
+                        </page>
+                        <page string="Other Info" name="other_info">
+                            <group>
+                                <field name="description" />
+                                <field name="account_move_id" groups="account.group_account_invoice" attrs="{'invisible': [('account_move_id', '=', False)]}" />
+                                <field name="company_id" groups="base.group_multi_company" />
+                                <field name="stock_valuation_layer_id" attrs="{'invisible': [('stock_valuation_layer_id', '=', False)]}" />
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="stock_valuation_layer_form" model="ir.ui.view">
+        <field name="name">stock.valuation.layer.tree</field>
+        <field name="model">stock.valuation.layer</field>
+        <field name="inherit_id" ref="stock_account.stock_valuation_layer_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='gp1']" position="after">
+            	<group name="gp2" colspan="4" col="6">
+	            	<field name="remaining_value" invisible="1"/>
+	            	<field name="lot_id" groups="etl_base.group_tech"/>
+	            	<field name="login_user_id" invisible="1"/>
+	            	<field name="sm_id" readonly="1" groups="etl_base.group_tech"/>
+	            	<field name="sm_qty" readonly="1" groups="etl_base.group_tech"/>
+	            	<field name="sml_ids" readonly="1" groups="etl_base.group_tech"/>
+	            	<field name="sml_id" readonly="1" groups="etl_base.group_tech"/>
+	            	<field name="move_line_id" readonly="1" groups="etl_base.group_tech"/>
+            	</group>
+            	<group name="gp3">
+            		<button name="update_sml_cost" string="Update SML" type="object" groups="etl_base.group_tech"/>
+            		<button name="correct_svl_jv" string="Update JV" type="object" groups="etl_base.group_tech"/>
+            		<button name="update_cost_correct_svl" string="Correct Cost" type="object" groups="etl_base.group_tech"/>
+            		<button name="update_mrp_svl" string="Correct MRP Cost" type="object" groups="etl_base.group_tech"/>
+            	</group>
+            </xpath>
+            <xpath expr="//field[@name='remaining_qty']" position="attributes">
+            	<attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="stock_account.stock_valuation_layer_report_action" model="ir.actions.act_window">
+        <field name="name">Stock Valuation</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">stock.valuation.layer</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="stock_account.stock_valuation_layer_tree"/>
+        <field name="context">{}</field>
+        <field name="domain">[('product_id.type', '=', 'product')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face"/>
+            <p>
+                There are no valuation layers. Valuation layers are created when there are product moves that impact the valuation of the stock.
+            </p>
+        </field>
+    </record>
+    
+    
+</data>
+</odoo>

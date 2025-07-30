@@ -1,0 +1,24 @@
+<odoo>
+    <record id="product_template_mrp_tree_view" model="ir.ui.view">
+        <field name="name">product.template.mrp.tree.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="list_price" position="after">
+                <field name="MRP_product"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="product_template_mrp_form_view" model="ir.ui.view">
+        <field name="name">product.template.mrp.form.view</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='general_information']//group[@name='group_standard_price']" position="inside">
+                <field name="MRP_product" class="oe_inline" widget='monetary'
+                       options="{'currency_field': 'currency_id', 'field_digits': True}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

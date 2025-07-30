@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data>
+
+    <record id="view_partner_form" model="ir.ui.view">
+        <field name="name">res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="before">
+            </xpath>
+            <xpath expr="//field[@name='country_id']" position="before">
+                <field name="region_id" placeholder="Region.."/>
+            </xpath>
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="aadhar_no"/>
+                <field name="partner_type" required="1"/>
+            </xpath>
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="partner_code" readonly="1"/>
+                <!-- <button name="update_partner_code" invisible="1" string="update_partner_code" type="object"/> -->
+                <field name="sfa_code"/>
+                <field name="tcs_ok"/>
+                <field name="invoice_decimal" invisible="1"/>
+                <field name="login_user_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//page[@name='sales_purchases']//field[@name='user_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//page[@name='sales_purchases']//field[@name='user_id']" position="after">
+                <field name="sales_executive_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+                <field name="zonal_head_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}" domain="[('is_zonal_head', '=', True)]"/>
+                <field name="tag_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_partner_kanban_view" model="ir.ui.view">
+        <field name="name">res.partner.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='active']" position="after">
+                <field name="partner_code"/>
+            </xpath>
+        </field>
+    </record>
+
+    <template id="web.brand_promotion_message" name="Brand Promotion Message">
+        <t t-set="final_message">Powered by <a t-attf-href="https://www.steigendit.com/web">Steigend IT Solutions</a></t>
+        <t t-out="final_message"/>
+    </template>
+
+    <template id="portal.portal_record_sidebar" name="My Portal Record Sidebar">
+        <div t-attf-class="#{classes}">
+            <div class="card bg-white mb-4 sticky-top" id="sidebar_content">
+                <div t-if="title" class="card-body text-center pb-2 pt-3">
+                    <t t-out="title"/>
+                </div>
+                <t t-if="entries" t-out="entries"/>
+                <div class="card-footer small text-center text-muted border-top-0 pt-1 pb-1 d-none d-lg-block">
+                    Powered by <a href="http://www.steigendit.com/web">Steigend IT Solutions</a>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <record id="view_res_partner_filter" model="ir.ui.view">
+        <field name="name">res.partner.filter</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <!-- Hide original salesperson filter -->
+            <xpath expr="//filter[@name='salesperson']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            <!-- Add custom group-by Sales Executive -->
+            <xpath expr="//filter[@name='salesperson']" position="after">
+                <filter string="Sales Executive" name="se" context="{'group_by':'sales_executive_id'}"/>
+            </xpath>
+
+            <!-- Add partner_type-based filters -->
+            <xpath expr="//filter[@name='inactive']" position="before">
+                <filter string="Customers" name="customer" domain="[('partner_type','in', ('customer', 'customer_exp'))]"/>
+                <filter string="Vendors" name="supplier" domain="[('partner_type','in', ('vendor', 'vendor_for'))]"/>
+                <filter string="Employees" name="emp" domain="[('partner_type','=', 'employee')]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="view_partner_tree" model="ir.ui.view">
+        <field name="name">res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="sales_executive_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+            </xpath>
+            <xpath expr="//field[@name='phone']" position="before">
+                <field name="partner_code"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_partner_form2" model="ir.ui.view">
+        <field name="name">res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="l10n_in.l10n_in_view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="attributes">
+                <attribute name="attrs">{'required': [('l10n_in_gst_treatment', 'in', ('regular', 'composition'))]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_partner_form3" model="ir.ui.view">
+        <field name="name">res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="account.view_partner_property_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='acc_number']" position="after">
+                <field name="ifsc_code" required="1"/>
+            </xpath>
+            <xpath expr="//field[@name='property_payment_term_id']" position="after">
+                <field name="customer_rank"/>
+            </xpath>
+            <xpath expr="//field[@name='property_supplier_payment_term_id']" position="after">
+                <field name="supplier_rank"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="sales_team.res_partner_view_team" model="ir.ui.view">
+        <field name="name">res.partner.view.team</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='sales_purchases']//field[@name='user_id']" position="after">
+                <field name="team_id" invisible="1"/>
+                <field name="team_id" invisible="1" groups="base.group_no_one" />
+            </xpath>
+            <field name="parent_id" position="attributes">
+                <attribute name="context">{'default_is_company': True, 'show_vat': True, 'default_user_id': user_id, 'default_team_id': team_id}</attribute>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_partner_bank_tree" model="ir.ui.view">
+        <field name="name">res.partner.bank.tree</field>
+        <field name="model">res.partner.bank</field>
+        <field name="inherit_id" ref="base.view_partner_bank_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='acc_number']" position="after">
+                <field name="ifsc_code"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_partner_bank_form" model="ir.ui.view">
+        <field name="name">res.partner.bank.form</field>
+        <field name="model">res.partner.bank</field>
+        <field name="inherit_id" ref="base.view_partner_bank_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='acc_number']" position="after">
+                <field name="ifsc_code" required="1"/>
+            </xpath>
+        </field>
+    </record>
+
+
+</data></odoo>

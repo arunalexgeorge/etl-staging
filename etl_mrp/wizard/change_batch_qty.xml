@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!--  Change Product Quantity -->
+        <record id="view_change_batch_qty_wizard" model="ir.ui.view">
+            <field name="name">Change Batch Quantity</field>
+            <field name="model">change.batch.qty</field>
+            <field name="arch" type="xml">
+                <form string="Change Batch Qty">
+                    <group>
+                        <field name="batch_qty"/>
+                        <field name="mo_id" invisible="1"/>
+                    </group>
+                    <footer>
+                        <button name="change_batch_qty" string="Approve" data-hotkey="q"
+                            colspan="1" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_change_batch_qty" model="ir.actions.act_window">
+            <field name="name">Change Batch Quantity</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">change.batch.qty</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+       
+    </data>
+</odoo>    

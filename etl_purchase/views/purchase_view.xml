@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data>
+    
+    <record id="purchase_order_form" model="ir.ui.view">
+        <field name="name">purchase.order.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="options">{'no_create_edit':True, 'no_create':True,'no_open': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='product_id']" position="attributes">
+                <attribute name="options">{'no_create_edit':True, 'no_create':True,'no_open': True}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='product_packaging_id']" position="attributes">
+                <attribute name="readonly">1</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_approve']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="attrs">{'readonly': [('state', '!=', 'draft')]}</attribute>
+            </xpath>
+            <xpath expr="//button[@name='button_approve']" position="after">
+            	<button name="button_approve_po" type="object" states="to approve" string="Approve PO" class="oe_highlight" data-hotkey="z"/>
+            	<!-- <button name="button_create_picking" type="object" states="to approve" string="Create Picking" class="oe_highlight" data-hotkey="z"
+            		attrs="{'invisible': [('login_user_id', '!=', 2)]}"/>
+            	<button name="button_approve_cfo" type="object" states="to_approve_cfo" string="CFO Approval" class="oe_highlight" groups="etl_base.group_purchase_cfo" data-hotkey="z"/> -->
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="attributes">
+                <attribute name="readonly">0</attribute>
+            </xpath>
+            <xpath expr="//button[@id='bid_confirm']" position="attributes">
+                <attribute name="groups">etl_base.group_purchase_confirm</attribute>
+            </xpath>
+            <xpath expr="//button[@id='draft_confirm']" position="attributes">
+                <attribute name="groups">etl_base.group_purchase_confirm</attribute>
+            </xpath>
+            <xpath expr="//div[@class='oe_button_box']" position="inside">
+                <button type="object"  name="action_view_approval"
+                      class="oe_stat_button" string="Request"
+                      icon="fa-pencil-square-o">
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="branch_purchase" attrs="{'invisible': [('branch_purchase', '=', False)]}" force_save="1"/>
+                <field name="login_user_id" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="before">
+            	<field name="sl_no"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='name']" position="attributes">
+            	<attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="before">
+            	<field name="alt_uom_id" attrs="{'column_invisible': [('parent.branch_purchase', '!=', True)]}" 
+            		options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+            	<field name="alt_uom_qty" sum="Total Packages" attrs="{'column_invisible': [('parent.branch_purchase', '!=', True)]}"/>
+            	<field name="remarks" attrs="{'column_invisible': [('parent.branch_purchase', '!=', True)]}"/>
+            	<field name="allow_unitprice_editing" invisible="1"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="attributes">
+            	<attribute name="attrs">{'readonly': [('allow_unitprice_editing', '!=', True)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="attributes">
+            	<attribute name="sum">Total</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="after">
+            	<field name="current_stock" sum="Total Stock" readonly="1" force_save="1" attrs="{'column_invisible': [('parent.po_type', '!=', 'stock')]}"/>
+            	<field name="avg_sales_qty" sum="Total Sales" readonly="1" force_save="1" attrs="{'column_invisible': [('parent.po_type', '!=', 'stock')]}"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <menuitem action="product.product_supplierinfo_type_action" 
+    	id="purchase.menu_product_pricelist_action2_purchase" 
+    	parent="purchase.menu_purchase_products" sequence="22"/>
+           
+    <record id="purchase_order_view_form_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase_stock.purchase_order_view_form_inherit"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='picking_type_id']" position="after">
+            	<field name="required_date"/>
+            	<field name="po_type" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+            	<field name="fiscal_year"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="purchase.purchase_order_kpis_tree" model="ir.ui.view">
+            <field name="name">purchase.order.inherit.purchase.order.tree</field>
+            <field name="model">purchase.order</field>
+            <field name="priority" eval="10"/>
+            <field name="arch" type="xml">
+                <tree string="Purchase Order" decoration-info="state in ['draft', 'sent']"
+                decoration-muted="state == 'cancel'"
+                class="o_purchase_order" js_class="purchase_dashboard_list" sample="1">
+                    <header>
+                        <button name="action_create_invoice" type="object" string="Create Bills"/>
+                    </header>
+                    <field name="priority" optional="show" widget="priority" nolabel="1"/>
+                    <field name="partner_ref" optional="hide"/>
+                    <field name="name" string="Reference" readonly="1" decoration-bf="1"/>
+                    <field name="date_order" optional="show"/>
+                    <field name="date_approve" optional="show"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="company_id" readonly="1" options="{'no_create': True}"
+                        groups="base.group_multi_company" optional="show"/>
+                    <field name="company_id" groups="!base.group_multi_company" invisible="1"/>
+                    <field name="date_planned" invisible="1"/>
+                    <field name="user_id" optional="show" widget="many2one_avatar_user"/>
+                    <field name="activity_ids" invisible="1" optional="show"/>
+                    <field name="origin" optional="show"/>
+                    <field name="amount_untaxed" sum="Total Untaxed amount" string="Untaxed" widget="monetary" optional="hide"/>
+                    <field name="amount_total" sum="Total amount" widget="monetary" optional="show" decoration-bf="state in ['purchase', 'done']"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="state" optional="show" widget="badge" decoration-success="state == 'purchase' or state == 'done'"
+                        decoration-warning="state == 'to approve'" decoration-info="state == 'draft' or state == 'sent'"/>
+                    <field name="invoice_status" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+    
+	</data>
+</odoo>

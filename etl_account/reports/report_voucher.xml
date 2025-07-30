@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_report_voucher" model="ir.actions.report">
+            <field name="name">Voucher</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">etl_account.report_voucher</field>
+            <field name="report_file">etl_account.report_voucher</field>
+            <field name="binding_model_id" eval="False"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="report_voucher_document">
+            <t t-call="web.external_layout">
+                <t t-set="o" t-value="o.with_context(lang=lang)"/>
+                <div class="page">
+                    <table width="100%" style="border:0px solid white;background-color: #FFFFFF;">
+                    	<tr>
+                    		<td style="padding-bottom:20px;font-size:30px;text-align:center;border:0px solid white;background-color: #FFFFFF;"><strong><span t-field="o.journal_id.name"/></strong><br/><br/></td>
+                    	</tr>
+                    </table>
+                    <table width="100%" style="border:0px solid white;background-color: #FFFFFF;">
+                    	<tr>
+                    		<td width="15%" style="border:0px solid white;background-color: #FFFFFF;color: #000000;"><strong>Voucher No</strong></td>
+                    		<td width="5%" style="border:0px solid white;background-color: #FFFFFF;color: #000000;"><strong>:</strong></td>
+                    		<td width="30%" style="border:0px solid white;background-color: #FFFFFF;color: #000000;"><strong><span t-field="o.name"/></strong></td>
+                    		<td width="15%" style="border:0px solid white;background-color: #FFFFFF;color: #000000;"><strong>Voucher Date</strong></td>
+                    		<td width="5%" style="border:0px solid white;background-color: #FFFFFF;color: #000000;"><strong>:</strong></td>
+                    		<td width="30%" style="border:0px solid white;background-color: #FFFFFF;color: #000000;"><strong><span t-field="o.date"/></strong></td>
+                    	</tr>
+                    </table>
+                    <br/><br/>
+                    <table style="font-size:12px;" width="100%">
+                        <tr>
+                            <td width="20%" style="color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:center;"><span>Account</span></td>
+                            <td width="30%" style="color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:center;">Parner</td>
+                            <td width="30%" style="color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:center;">Narration</td>
+                            <td width="10%" style="color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:right;padding-right:5px;"><span>Debit</span></td>
+                            <td width="10%" style="color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:right;padding-right:5px;"><span>Credit</span></td>
+                        </tr>
+                        <t t-set="current_subtotal" t-value="0.0"/>
+                        <t t-foreach="o.line_ids" t-as="line">
+                            <t t-set="current_subtotal" t-value="current_subtotal + line.debit"/>
+                            <tr>
+                                <td style="color: #000000;padding-left:5px;background-color: #FFFFFF;"><span t-field="line.account_id.name"/></td>
+                                <td style="color: #000000;padding-left:5px;background-color: #FFFFFF;"><span t-field="line.partner_id.name"> </span></td>
+                                <td style="color: #000000;padding-left:5px;background-color: #FFFFFF;"><span t-field="line.name"> </span></td>
+                                <td style="color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;"><span t-esc="line.get_formatted_value(line.debit)"/></td>
+                                <td style="color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;"><span t-esc="line.get_formatted_value(line.credit)"/></td>
+                            </tr>
+                        </t>
+                        <tr>
+                         <td style="color: #000000;border-top:1px solid black;text-align:center;background-color: #FFFFFF;" colspan="3"><strong>Total</strong></td>
+                         <td style="color: #000000;padding-right:5px;border-top:1px solid black;text-align:right;background-color: #FFFFFF;"><span t-esc="o.get_formatted_value(current_subtotal)"/></td>
+                         <td style="color: #000000;padding-right:5px;border-top:1px solid black;text-align:right;background-color: #FFFFFF;"><span t-esc="o.get_formatted_value(current_subtotal)"/></td>
+                        </tr>
+                	</table>
+                	<table width="100%" style="border:0px solid white;background-color: #FFFFFF;">
+	               		<tr>
+	               			<t t-if="not o.journal_id.payment_voucher">
+	               				<td width="50%" style="border:0px solid white;padding-right:5px;color: #000000;background-color: #FFFFFF;"><br/><br/><br/>Verified By</td>
+	               			</t>
+	               			<t t-if="o.journal_id.payment_voucher">
+	               				<td width="50%" style="border:0px solid white;padding-right:5px;color: #000000;background-color: #FFFFFF;"><br/><br/><br/>Receiver's Signature</td>
+	               			</t>
+	               			<td width="50%" style="border:0px solid white;text-align:right;padding-right:5px;color: #000000;background-color: #FFFFFF;"><br/><br/><br/>Authorised Signatory</td>
+	               		</tr>
+               		</table>
+                </div>
+            </t>
+        </template>
+
+        <template id="report_voucher">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="etl_account.report_voucher_document" t-lang="lang"/>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

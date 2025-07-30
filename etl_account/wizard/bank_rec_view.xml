@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="view_bank_reconcile_form" model="ir.ui.view">
+            <field name="name">Bank Reconciliation</field>
+            <field name="model">bank.reconcile</field>
+            <field name="arch" type="xml">
+                <form string="Bank Reconciliation" create="false">
+                    <group>
+                    	<button name="action_reconcile" string="Reconcile" data-hotkey="q"
+                            colspan="1" type="object" class="btn-primary"/>
+                    </group>
+                    <group>
+                    	<group>
+                    		<field name="journal_id" required="1" domain="[('type', '=', 'bank')]"
+                    			options="{'no_edit_create': True, 'no_create': True}"/>
+                    		<field name="date" required="1"/>
+                    	</group>
+                    	<group>
+                    		<field name="ledger_balance" readonly="1" force_save="1"/>
+                    		<field name="unrec_balance" readonly="1" force_save="1"/>
+                    		<field name="bank_balance" readonly="1" force_save="1"/>
+                    	</group>
+                    </group>
+                    <notebook>
+                    	<page string="Payments/Receipts">
+                    		<field name="line_ids" nolabel="1">
+		                   		<tree create="false" delete="false" editable="bottom">
+		                   			<field name="date" width="10%"/>
+		                   			<field name="name" width="30%"/>
+		                   			<field name="voucher_type" width="15%"/>
+		                   			<field name="voucher_no" width="10%"/>
+		                   			<field name="trans_type" width="15%" string="Trans Type"/>
+		                   			<field name="inst_no" width="15%" string="Inst #"/>
+		                   			<field name="inst_date" width="15%" string="Inst Date"/>
+		                   			<field name="bank_date" width="15%"/>
+		                   			<field name="debit" width="10%"/>
+		                   			<field name="credit" width="10%"/>
+		                   			<field name="move_line_id" invisible="1"/>
+		                   		</tree>
+                   			</field>
+                    	</page>
+                    	<page string="Batch Payments">
+                    		<field name="batch_line_ids" nolabel="1">
+		                   		<tree create="false" delete="false" editable="bottom">
+		                   			<field name="date" width="10%"/>
+		                   			<field name="name" width="30%"/>
+		                   			<field name="voucher_type" width="15%"/>
+		                   			<field name="voucher_no" width="10%"/>
+		                   			<field name="trans_type" width="15%" string="Trans Type"/>
+		                   			<field name="inst_no" width="15%" string="Inst #"/>
+		                   			<field name="inst_date" width="15%" string="Inst Date"/>
+		                   			<field name="bank_date" width="15%"/>
+		                   			<field name="debit" width="10%"/>
+		                   			<field name="credit" width="10%"/>
+		                   			<field name="batch_payment_id" invisible="1"/>
+		                   		</tree>
+                   			</field>
+                    	</page>
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_bank_reconcile" model="ir.actions.act_window">
+            <field name="name">Bank Reconciliation</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">bank.reconcile</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>
+       
+       <!-- <menuitem id="menu_action_bank_reconcile" 
+       		parent="account.menu_finance_entries_actions" 
+       		action="action_bank_reconcile" sequence="106"/> -->
+       <menuitem id="account_accountant.menu_action_manual_reconciliation" 
+       		parent="account.menu_finance_entries_actions" 
+       		action="account_accountant.action_manual_reconciliation" sequence="25" 
+       		groups="account.group_account_user" name="Partner Allocation"/>
+       
+    </data>
+</odoo>    

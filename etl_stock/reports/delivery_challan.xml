@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_report_delivery_chalan" model="ir.actions.report">
+            <field name="name">JobWork Challan</field>
+            <field name="model">stock.picking</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">etl_stock.report_delivery_challan</field>
+            <field name="report_file">etl_stock.report_delivery_challan</field>
+            <field name="print_report_name">'Delivery_Challan_%s' % object.name</field>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="etl_stock.paperformat_packing_slip"/>
+        </record>
+        
+        <template id="report_delivery_challan_document">
+            <t t-call="web.html_container">
+                <t t-call="web.basic_layout">
+                    <div class="page">
+                        <div>
+                            <table style="border:1px solid black;" width="100%">
+                                <tr style="border-bottom:1px solid black;">
+                                    <td class="text-center"><img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)" height="100px" alt="Logo"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: center;"><strong><b>JOB WORK DELIVERY CHALLAN</b></strong></td>
+                                </tr>
+                            </table>
+                            <table style="border:1px solid black;font-size:15px;" width="100%">
+                                <tr>
+                                    <td width="40%" style="border-right:1px solid black;">
+                                        <table width="100%">
+                                            <tr style="border-bottom:1px solid black;"><td><span t-field="o.company_id"/></td></tr>
+                                            <tr style="border-bottom:1px solid black;"><td><span t-field="o.company_id.street"/></td></tr>
+                                            <tr style="border-bottom:1px solid black;"><td><strong><b>GSTIN:</b></strong><span t-field="o.company_id.vat"/></td></tr>
+                                            <tr style="border-bottom:1px solid black;"><td><strong><b>CIN:</b></strong><span t-field="o.company_id.company_registry"/></td></tr>
+                                            <tr><td><strong><b>CONTACT NO:</b></strong><span t-field="o.company_id.phone"/></td></tr>
+                                        </table>
+                                    </td>
+                                    <td width="60%">
+                                        <table width="100%">
+                                            <tr style="border-bottom:1px solid black;"><td><span t-field="o.partner_id"/></td></tr>
+                                            <tr style="border-bottom:1px solid black;"><td><strong><b>GSTIN:</b></strong><span t-field="o.partner_id.vat"/></td></tr>
+                                            <tr><td> </td></tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table width="100%" style="border:1px solid black;">
+                                <tr>
+                                    <td width="10%">
+                                        <table width="100%">
+                                            <tr><td></td></tr>
+                                            <tr><td></td></tr>
+                                            <tr><td></td></tr>
+                                            <tr><td></td></tr>
+                                        </table>
+                                    </td>
+                                    <td width="90%">
+                                        <table width="100%" style="border-left:1px solid black;border-right:1px solid black;font-size:13px;">
+                                            <tr style="border-bottom:1px solid black;">
+                                                <td style="border-right:1px solid black;">Consignee Name:</td>
+                                                <td style="border-right:1px solid black;"><span t-field="o.partner_id.name"/></td>
+                                                <td style="border-right:1px solid black;">Delivery Chalan #:</td>
+                                                <td><span t-field="o.name"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="padding:3px;border-right:1px solid black;">Consignee Address:</td>
+                                                <td style="border-bottom:1px solid black;border-right:1px solid black;"><span t-field="o.partner_id.street"/></td>
+                                                <td style="border-bottom:1px solid black;border-right:1px solid black;">Delivery Chalan Date:</td>
+                                                <td style="border-bottom:1px solid black;border-right:1px solid black;"><span t-field="o.date_done" t-options="{'widget': 'date'}"/></td>
+                                            </tr>
+                                            <tr style="border-bottom:1px solid black;">
+                                                <td style="border-right:1px solid black;"> </td>
+                                                <td style="border-right:1px solid black;"><span t-field="o.partner_id.city"/></td>
+                                                <td style="border-right:1px solid black;">Place of Supply:</td>
+                                                <td><span t-field="o.company_id.state_id.name"/>-<span t-field=" o.company_id.state_id.code"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="border-right:1px solid black;">Customer GSTIN:</td>
+                                                <td style="border-right:1px solid black;"><span t-field="o.partner_id.vat"/></td>
+                                                <td style="border-right:1px solid black;">Applicable Tax Rate:</td>
+                                                <td><span t-field="o.product_id.taxes_id"/></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table width="100%" style="border-left:1px solid black;border-right:1px solid black;">
+                                <tr>
+                                    <td style="font-size:13px;padding:5px;">Transport Details:</td>
+                                </tr>
+                            </table>
+                            <table width="100%" style="border:1px solid black;">
+                                <tr style="border-bottom:1px solid black;">
+                                    <td width="10%">
+                                        <table width="100%">
+                                            <tr><td></td></tr>
+                                            <tr><td></td></tr>
+                                            <tr><td></td></tr>
+                                            <tr><td></td></tr>
+                                        </table>
+                                    </td>
+                                    <td width="90%">
+                                        <table width="100%" style="border-left:1px solid black;border-right:1px solid black;font-size:13px;">
+                                            <tr style="border-bottom:1px solid black;">
+                                                <td colspan="4" style="padding:10px;border-right:1px solid black;">Transportation Mode:&#160;&#160;<span t-field="o.transport_mode"/></td>
+                                                <td colspan="2" style="padding:10px;border-left:1px solid black;">Vehicle No:</td>
+                                                <td colspan="4" style="padding:10px;border-left:1px solid black;"><span t-field="o.vehicle_no"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="4" style="padding:10px;border-right:1px solid black;">Transport Company:&#160;&#160;<span t-field="o.transport_company"/></td>
+                                                <td colspan="2" style="padding:10px;border-left:1px solid black;">Dispatch Date:</td>
+                                                <td colspan="4" style="padding:10px;border-left:1px solid black;"><span t-field="o.dispatch_date"/></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            <table width="100%" style="border-left:1px solid black;border-right:1px solid black;">
+                                <tr>
+                                    <td style="font-size:13px;padding:5px;">Product-wise Details:</td>
+                                </tr>
+                            </table>
+                            <table width="100%" class="table table-bordered" style="border:1px solid black;">
+                                <thead>
+                                    <tr>
+                                        <th width="5%" class="text-center" style="padding:8px;font-size:12px">Sr.No</th>
+                                        <th width="30%" class="text-center" style="padding:8px;font-size:12px">Product Description</th>
+                                        <th width="15%" class="text-center" style="padding:8px;font-size:12px">HSN/SAC Code</th>
+                                        <th width="10%" class="text-center" style="padding:8px;font-size:12px">Qty</th>
+                                        <th width="10%" class="text-center" style="padding:8px;font-size:12px">Unit</th>
+                                        <th width="10%" class="text-center" style="padding:8px;font-size:12px">Rate</th>
+                                        <th width="10%" class="text-center" style="padding:8px;font-size:12px">Value</th>
+                                        <th width="10%" class="text-center" style="padding:8px;font-size:12px">Disc.</th>
+                                        <th width="10%" class="text-center" style="padding:8px;font-size:12px">Taxable Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-set="total_value" t-value="0"/>
+                                    <t t-set="i" t-value="1"/>
+                                    <t t-foreach="o.move_ids_without_package" t-as="move">
+                                        <tr>
+                                            <td style="padding:8px;font-size:12px"><span t-esc="i"/></td>
+                                            <td style="padding:8px;font-size:12px"><span t-field="move.product_id"/></td>
+                                            <td style="padding:8px;font-size:12px" t-if="o.company_id.account_fiscal_country_id.code == 'IN'"><span t-if="move.product_id.l10n_in_hsn_code" t-field="move.product_id.l10n_in_hsn_code"/></td>
+                                            <td style="padding:8px;font-size:12px"><span t-field="move.product_uom_qty"/></td>
+                                            <td style="padding:8px;font-size:12px"><span t-field="move.product_uom"/></td>
+                                            <t t-set="value" t-value="0"/>
+                                            <t t-set="value" t-value="move.product_uom_qty * move.product_id.standard_price"/>
+                                            <t t-set="total_value" t-value="total_value + value"/>
+                                            <td style="padding:8px;font-size:12px"><span t-field="move.product_id.standard_price"/></td>
+                                            <td style="padding:8px;font-size:12px"><span t-esc="round(value, 2)"/></td>
+                                            <td style="padding:8px;font-size:12px"> </td>
+                                            <td style="padding:8px;font-size:12px"><span t-esc="round(value, 2)"/></td>
+                                            <t t-set="i" t-value="i + 1"/>
+                                        </tr>
+                                    </t>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td style="text-align:right;font-size:13px;">G.T</td>
+                                        <td><span t-esc="round(total_value, 2)"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" style="font-size:13px;">Chalan Total in Words</td>
+                                        <td colspan="5"></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr style="border-left:1px solid black;border-right:1px solid black;border-bottom:1px solid black;">
+                                       <td colspan="9"></td>
+                                    </tr>
+                                    <tr style="border-left:1px solid black;border-right:1px solid black;">
+                                        <td colspan="4" style="text-align:center;border-bottom:1px solid black;">REMARKS</td>
+                                        <td></td>
+                                        <td colspan="4" style="border-bottom:1px solid black;font-size:13px;">Authorised Signatory</td>
+                                    </tr>
+                                    <tr style="border-left:1px solid black;border-right:1px solid black;">
+                                        <td colspan="4" style="font-size:10px;border-bottom:1px solid black;padding-left:5px;"><span t-esc="o.remarks or ''"></span></td>
+                                        <td style="padding:40px;"></td>
+                                        <td colspan="4" style="padding:40px;border-bottom:1px solid black;"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+        <template id="report_delivery_challan">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="etl_stock.report_delivery_challan_document" t-lang="o.partner_id.lang or o.env.lang"/>
+            </t>
+        </template>
+        
+    </data>
+</odoo>

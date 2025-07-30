@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="paperformat_packing_slip" model="report.paperformat">
+        <field name="name">Packing Slip Format</field>
+        <field name="default" eval="True" />
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">30</field>
+        <field name="margin_bottom">30</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">30</field>
+        <field name="dpi">90</field>
+    </record>
+    
+    <record id="action_report_packing_slip" model="ir.actions.report">
+            <field name="name">Packing Slip</field>
+            <field name="model">stock.picking</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">etl_stock.report_packing_slip</field>
+            <field name="report_file">etl_stock.report_packing_slip</field>
+            <field name="print_report_name">'Packing_Slip_%s_%s' % (object.partner_id.name or '', object.name)</field>
+            <field name="binding_model_id" ref="stock.model_stock_picking"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="etl_stock.paperformat_packing_slip"/>
+        </record>
+    
+    <template id="external_layout_packing_slip">
+        <div class="header">
+            <table  width="100%" style="border:0px solid white;">
+                <tr>
+                    <td width="20%">
+                        <table>
+                            <tr>
+                                <td><img t-if="res_company.logo" t-att-src="image_data_uri(res_company.logo)" style="height: 100px;" alt="Logo"/></td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td with="80%">
+                        <table width="100%" style="border:0px solid white;">
+                            <tr style="height:10px;">
+                                <td style="background-color: #000035;color: #ffffff;text-align: right;padding:10px;font-size:18px;"><b>PACKING SLIP</b></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="article o_report_layout_standard">
+            <t t-out="0"/>
+        </div>
+        <div class="footer">
+            <table class="table-borderless" width="100%">
+                <tr>
+                    <td width="50%" style="background-color:#000035;color: #ffffff;padding:10px;border-right:solid #000035;">
+                        <div class="text-start" style="font-size:10px">
+                            <div t-field ="o.branch_id.company_id"/>
+                            <div t-field ="o.branch_id.address"/>
+                        </div>
+                    </td>
+                    <td width="50%" style="background-color:#000035;color: #ffffff;padding:10px">
+                        <div class="text-end" style="font-size:10px">
+                            <ul class="list-inline">
+                                <li>Page<span class="page" /> of <span class="topage" /></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </template>
+    
+    <template id="report_packing_slip_document">
+        <t t-call="web.html_container">
+            <t t-call="etl_stock.external_layout_packing_slip">
+                    <div class="page">
+                        <div>
+                            <table  style="border: 2px solid black;" width="100%">
+                                <tr style="border:2px solid black;">
+                                    <td width="50%">
+                                        <table width="100%">
+                                            <tr style="font-size:10pt;border:0px solid white;">
+                                                <td width="5%">&#160;&#160;<b>Customer Name</b></td>
+                                                <td width="2%">:</td>
+                                                <td width="43%"><span t-field="o.partner_id.name"/></td>
+                                            </tr>
+                                            <tr style="font-size:10pt;border:0px solid white;">
+                                                <td width="50%"><p><br/></p> </td>
+                                            </tr>
+                                            <tr style="font-size:10pt;border:0px solid white;">
+                                                <td width="5%">&#160;&#160;<b>GST No</b></td>
+                                                <td width="2%">:</td>
+                                                <td width="43%"><span t-field="o.partner_id.vat"/></td>
+                                            </tr>
+                                            <tr style="font-size:10pt;border:0px solid white;">
+                                                <td width="5%">&#160;&#160;<b><img src='/etl_reports_module/static/description/icon.png' style="max-height: 15px;max-width:20px;line-height:2px;" alt="Logo"/>&#160;Phone</b></td>
+                                                <td width="2%">:</td>
+                                                <td width="45%"><span t-field="o.partner_id.phone"/></td>
+                                            </tr>
+                                            <tr style="font-size:10pt;border:0px solid white;">
+                                                <td width="5%">&#160;&#160;<b><img src='/etl_reports_module/static/description/icon.png' style="max-height: 15px;max-width:20px;line-height:2px;" alt="Logo"/>&#160;Mobile</b></td>
+                                                <td width="2%">:</td>
+                                                <td width="45%"><span t-field="o.partner_id.mobile"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td> </td>
+                                            </tr>
+                                        </table>
+                                        <td style="border-left:2px solid black;"> </td>
+                                    </td>
+                                    <td width="50%">
+                                        <table width="100%">
+                                            <tr style="font-size:10pt;border:0px solid white;">
+                                                <td width="20%">&#160;&#160;<b>Packing Slip No</b></td>
+                                                <td width="5%">:</td>
+                                                <td width="25%"><span t-field="o.name"/></td>
+                                            </tr>
+                                            <tr style="font-size:10pt;border:0px solid white;">
+                                                <td width="20%">&#160;&#160;<b>Packing Slip Date</b></td>
+                                                <td width="5%">:</td>
+                                                <td width="25%"><span t-field="o.scheduled_date" t-options="{'widget': 'date'}"/></td>
+                                            </tr>
+                                            <tr style="font-size:10pt;border:0px solid white;">
+                                                <td width="20%">&#160;&#160;<b>Sales Order No</b></td>
+                                                <td width="5%">:</td>
+                                                <td width="25%"><span t-field="o.origin"/></td>
+                                            </tr>
+                                            <tr style="font-size:10pt;border:0px solid white;">
+                                                <td width="20%">&#160;&#160;<b>Sales Order Date</b></td>
+                                                <td width="5%">:</td>
+                                                <td width="25%"><span t-field="o.sale_order_id.date_order" t-options="{'widget': 'date'}"/></td>
+                                            </tr>
+                                            <tr style="font-size:10pt;border:0px solid white;">
+                                                <td width="20%">&#160;&#160;<b>Customer Ref No</b></td>
+                                                <td width="5%">:</td>
+                                                <td width="25%"><span t-field="o.sale_order_id.client_order_ref"/></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <p><br/></p>
+                        <table width="100%" class="table table-bordered" style="border:1px solid black;">
+                                <tr>
+                                    <th width="5%" style="background-color: #000035;color: #ffffff;text-align: center;padding: 8px;font-size:10px">Sl.No</th>
+                                    <th width="10%" style="background-color: #000035;color: #ffffff;text-align: center;padding: 8px;font-size:10px">Product Pattern Code</th>
+                                    <th width="25%" style="background-color: #000035;color: #ffffff;text-align: center;padding: 8px;font-size:10px">Product</th>
+                                    <th width="10%" style="background-color: #000035;color: #ffffff;text-align: center;padding: 8px;font-size:10px">Product Category</th>
+                                    <th width="5%" style="background-color: #000035;color: #ffffff;text-align: center;padding: 8px;font-size:10px">Order Qty in Bag</th>
+                                    <th width="5%" style="background-color: #000035;color: #ffffff;text-align: center;padding: 8px;font-size:10px">Number of Belts</th>
+                                    <th width="10%" style="background-color: #000035;color: #ffffff;text-align: center;padding: 8px;font-size:10px">Pack Weight</th>
+                                    <th width="10%" style="background-color: #000035;color: #ffffff;text-align: center;padding: 8px;font-size:10px">Lot No</th>
+                                    <th width="20%" style="background-color: #000035;color: #ffffff;text-align: center;padding: 8px;font-size:10px">Serial No</th>
+                                </tr>
+                            <t t-set="i" t-value="1"/>
+                            <t t-set="serial_details" t-value="o.get_serial_details()"/>
+                            
+                            <tbody>
+                            	<t t-foreach="serial_details[0]" t-as="s">
+                            		<tr>
+                            			<t t-set="product_details" t-value="o.product_details(serial_details[0],s)"/>
+                                        <td style="text-align: center; padding: 5px;font-size:10px;"><span t-esc="i"/></td>
+                                        <td style="text-align: center; padding: 5px;font-size:10px;"><span t-esc="product_details[0]"/></td>
+                                        <td style="text-align: center; padding: 5px;font-size:10px;"><span t-esc="product_details[1]"/></td>
+                                        <td style="text-align: center; padding: 5px;font-size:10px;"><span t-esc="product_details[2]"/></td>
+                                        <td style="text-align: center; padding: 5px;font-size:10px;"><span t-esc="product_details[3]"/></td>
+                                        <td style="text-align: center; padding: 5px;font-size:10px;"><span t-esc="product_details[4]"/></td>
+                                        <td style="text-align: center; padding: 5px;font-size:10px;"><span t-esc="product_details[5]"/></td>
+                                        <td style="text-align: center; padding: 5px;font-size:10px;"><span t-esc="product_details[6]"/></td>
+                                        <td style="text-align: center; padding: 5px;font-size:10px;">
+                                       		<t t-foreach="product_details[7]" t-as="sn">
+                                       			<span t-esc="sn"/><br/>
+                                       		</t>
+                                        </td>
+                                        <t t-set="i" t-value="i+1"/>
+                                    </tr>
+                            	</t>
+                            	<tr style="border:1px solid black;">
+                                    <td colspan="4" class="text-center" style="font-size:15px;"><strong>Total</strong></td>
+                                    <td class="text-center" style="font-size:15px;"><span t-esc="serial_details[2]"/></td>
+                                    <td class="text-center" style="font-size:15px;"></td>
+                                    <td class="text-center" style="font-size:15px;"><span t-esc="serial_details[1]"/></td>
+                                    <span t-esc="serial_details[2]"/>
+                                    <td> </td>
+                                   <td> </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        
+                        <div class="row" style="page-break-inside:avoid;">
+                            <div class="col-6">
+                                <table width="50%" class="table table-bordered" style="page-break-inside:avoid;border:1px solid black;font-size:10pt;">
+		                            <tr>
+		                                <td class="text-center" style="padding: 10px;font-weight:bold;"><b></b></td>
+		                                <td class="text-center" style="padding: 10px;font-weight:bold;"><b>Bag</b></td>
+		                                <td class="text-center" style="padding: 10px;font-weight:bold;"><b>Box</b></td>
+		                                <td class="text-center" style="padding: 10px;font-weight:bold;"><b>Drum</b></td>
+		                                <td class="text-center" style="padding: 10px;font-weight:bold;"><b>Can</b></td>
+		                                <td class="text-center" style="padding: 10px;font-weight:bold;"><b>Belt/Ltr/Roll</b></td>
+		                                <td class="text-center" style="padding: 10px;font-weight:bold;"><b>Pack Weight</b></td>
+		                            </tr>
+		                           	<tr>
+		                               <td class="text-center" style="padding: 10px;"><b>PCTR</b></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.pctr_bag or ''"/></td>
+		                               <td class="text-center" style="padding: 10px;"></td>
+		                               <td class="text-center" style="padding: 10px;"></td>
+		                               <td class="text-center" style="padding: 10px;"></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.pctr_belt or ''"/></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.pctr_weight or ''"/></td>
+		                           	</tr>
+		                           	<tr>
+		                               <td class="text-center" style="padding: 10px;"><b>BG</b></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.bg_bag or ''"/></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.bg_box or ''"/></td>
+		                               <td class="text-center" style="padding: 10px;"></td>
+		                               <td class="text-center" style="padding: 10px;"></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.bg_roll or ''"/></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.bg_weight or ''"/></td>
+		                           	</tr>
+		                           	<tr>
+		                               <td class="text-center" style="padding: 10px;"><b>BVC</b></td>
+		                               <td class="text-center" style="padding: 10px;"></td>
+		                               <td class="text-center" style="padding: 10px;"></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.bvc_drum or ''"/></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.bvc_can or ''"/></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.bvc_ltr or ''"/></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.bvc_weight or ''"/></td>
+		                           	</tr>
+		                           	<tr>
+		                               <td class="text-center" style="padding: 10px;"><b>CT</b></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.ct_bag or ''"/></td>
+		                               <td class="text-center" style="padding: 10px;"></td>
+		                               <td class="text-center" style="padding: 10px;"></td>
+		                               <td class="text-center" style="padding: 10px;"></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.ct_belt or ''"/></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.ct_weight or ''"/></td>
+		                           	</tr>
+		                           	<tr>
+		                               <td class="text-center" style="padding: 10px;"><b>Total</b></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.total_sn_bag() or ''"/></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.bg_box or ''"/></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.bvc_drum or ''"/></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.bvc_can or ''"/></td>
+		                               <td class="text-center" style="padding: 10px;"></td>
+		                               <td class="text-center" style="padding: 10px;"><span t-esc="o.total_sn_weight() or ''"/></td>
+		                           	</tr>
+                        		</table>
+                            </div>
+                            <div class="col-6">
+                            </div>
+                            
+                        </div>
+                        <br/><br/>
+                        <div class="container" style="page-break-inside:avoid;">
+                            <div class="row">
+                                <div class="col-auto col-3 mw-100 mb-2">
+                                    <p style="font-size:10px;">Packed By&amp;emsp;&amp;emsp;-----------------------------------------</p>
+                                </div>
+                                <div class="col-auto col-3 mw-100 mb-2">
+                                    <p style="font-size:10px;">Checked By&amp;emsp;&amp;emsp;------------------------------------------</p>
+                                </div>
+                                <div class="col-auto col-3 mw-100 mb-2">
+                                    <p style="font-size:10px;">Prepared By&amp;emsp;&amp;emsp;------------------------------------------</p>
+                                </div>
+                            </div>
+                        </div>
+                        <br/><br/>
+                        <div class="row" style="page-break-inside:avoid;">
+                            <div class="col-6">
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-bordered" style="border:1px solid black;font-weight:bold;">
+                                    <tr style="padding:20px;">
+                                        <td>
+                                            <p style="text-align:center;font-size:10px;">Certified that the particulars given above are true and correct</p>
+                                            <br/>
+                                            <br/>
+                                            <p style="text-align:center;font-size:10px;">Authorised Signatory</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+            </t>
+        </t>
+    </template>
+    <template id="report_packing_slip">
+        <t t-foreach="docs" t-as="o">
+            <t t-call="etl_stock.report_packing_slip_document" t-lang="o.partner_id.lang or o.env.lang"/>
+        </t>
+    </template>
+    </data>
+</odoo>

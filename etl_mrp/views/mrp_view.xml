@@ -1,0 +1,674 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data>
+    
+    <menuitem id="mrp.menu_mrp_traceability"
+          name="Lot Numbers"
+          parent="mrp.menu_mrp_bom"
+          action="stock.action_production_lot_form"
+          groups="stock.group_production_lot"
+          sequence="15"/>
+          
+    <record id="mrp_production_form_view" model="ir.ui.view">
+        <field name="name">mrp.production.form</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='product_qty']" position="before">
+                <label for="batch_qty" string="No. of Batch/Bag/Belt"/>
+                <div class="d-flex flex-row">
+                	<field name="batch_qty"  class="oe_inline text-start" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                	<button type="action" name="%(etl_mrp.action_change_batch_qty)d"
+                		context="{'default_mo_id': id}" string="Change Qty" style="margin: 0px; padding: 0px;" 
+                		attrs="{'invisible': [('state', '=', 'done')]}">
+                	</button>
+                	<button type="object" name="button_generate_sns"
+                		string="Generate Serial No.s" style="margin: 0px; padding: 0px;" 
+                		attrs="{'invisible': ['|',('serial_ok', '=', True),('fg', '!=', True)]}">
+                	</button>
+                </div>
+                <field name="serial_ok" invisible="1"/>
+                <field name="fg" invisible="1"/>
+                <field name="curing" invisible="1"/>
+                <field name="conversion_cost" invisible="1"/>
+            </xpath>
+            <xpath expr="//button[@name='button_unbuild']" position="after">
+                <button name="action_print_label" type="object" string="PRINT LABEL" class="oe_highlight" attrs="{'invisible': [('fg', '!=', True)]}"/>
+                <button name="create_serial_numbers" type="object" string="Create Serial Numbers" class="oe_highlight" 
+                	attrs="{'invisible': ['|',('login_user_id', 'not in', (2,50)),('state', '!=', 'done'),('fg', '!=', True)]}"/>
+                <button name="mrp_svl_correction" type="object" string="Svl Correction" groups="etl_base.group_tech" invisible="0" states="done"/>
+                <button name="mrp_svl_correction" type="object" string="Valuation Correction" groups="etl_base.group_tech_admin" invisible="0" sates="done"/>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="after">
+            	<!-- <field name="shift1" attrs="{'readonly': [('state', '=', 'done')]}"/>
+            	<field name="shift2" attrs="{'readonly': [('state', '=', 'done')]}"/>
+            	<field name="shift3" attrs="{'readonly': [('state', '=', 'done')]}"/> -->
+            	<field name="show_request_button" invisible="1"/>
+            	<field name="is_export" invisible="1"/>
+            	<field name="label_type" required="1"/>
+            	<field name="login_user_id" invisible="1"/>
+            	<field name="unit_cost" groups="etl_base.group_tech,etl_base.group_tech_admin"/>
+            </xpath>
+            <xpath expr="//button[@name='action_cancel']" position="after">
+            	<button type="object" name="action_request_stock" attrs="{'invisible':[('show_request_button', '!=', True)]}"
+                		string="Request Stock">
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='move_raw_ids']/tree//field[@name='product_uom_qty']" position="before">
+            	<field name="current_stock"/>
+            	<field name="actual_bom_qty" invisible="1"/>
+            	<field name="bom_qty" groups="etl_base.group_bom_qty"/>
+            </xpath>
+            <xpath expr="//field[@name='move_raw_ids']/tree//field[@name='quantity_done']" position="before">
+            	<field name="login_user_id" invisible="1"/>
+            	<field name="mrp_consumed_qty" invisible="1" attrs="{'invisible': [('login_user_id', '!=', 2)]}"/>
+            	<field name="mrp_manual_consumed_qty" invisible="1" attrs="{'invisible': [('login_user_id', '!=', 2)]}"/>
+            	<button name="action_status_done" type="object" string="SMD" class="oe_highlight" invisible="1" attrs="{'invisible': [('login_user_id', '!=', 2)]}"/>
+            	<button name="action_status_cancel" type="object" string="SMC" class="oe_highlight" invisible="1" attrs="{'invisible': [('login_user_id', '!=', 2)]}"/>
+            </xpath>
+            
+            <xpath expr="//field[@name='lot_producing_id']" position="attributes">
+            	<attribute name="attrs">{'readonly': [('state', '=', 'done')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='date_planned_start']" position="attributes">
+            	<attribute name="attrs">{'readonly': [('state', '=', 'done')]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='move_raw_ids']/tree//button[@name='action_show_details']" position="after">
+            	<button string="Lot Numbers" type="object"
+            		name="action_open_product_lot"
+                    attrs="{'invisible': ['|',('has_tracking', '=','none'), ('parent.state', '=', 'done')]}"
+                    class="oe_stat_button" icon="fa-bars" />
+            </xpath>
+            <xpath expr="//page[@name='miscellaneous']" position="after">
+            	<page string="Serial Numbers" attrs="{'invisible': [('fg', '!=', True)]}">
+	            	<field name="serial_line_ids" attrs="{'readonly': [('state', '=', 'done')]}">
+	            		<tree editable="bottom" create="false">
+	            			<field name="name" readonly="1"/>
+	            			<field name="serial_id" readonly="1" invisible="1"/>
+	            			<field name="quantity" sum="Total Weight"/>
+	            			<field name="state" invisible="0"/>
+	            			<button name="action_approve" string="Approve" groups="etl_base.group_production_approval" type="object" attrs="{'invisible': ['|',('parent.state','=','done'),('state', '!=', 'waiting')]}"/>
+	            			<button name="action_reject" string="Reject" type="object" attrs="{'invisible': ['|',('parent.state','=','done'),('state', '!=', 'waiting')]}"/>
+	            			<field name="state_manual" invisible="1"/>
+	            			<field name="weight_bag" invisible="1"/>
+	            			<field name="tolerance" invisible="1"/>
+	            			<button name="action_print_label" type="object" string="PRINT LABEL" class="oe_highlight"/>
+	            		</tree>	
+	            		<form>
+	            			<group>
+	            				<field name="name"/>
+		            			<field name="quantity" width="20%"/>
+	            			</group>
+	            		</form>
+	            	</field>
+				</page>
+				<page string="Press" attrs="{'invisible': [('curing', '!=', True)]}">
+	            	<field name="shift_line_ids" attrs="{'readonly': [('state', '=', 'done')]}">
+	            		<tree editable="bottom" create="false" delete="false">
+	            			<field name="shift" readonly="1" class="fw-bold"/>
+	            			<field name="press_1"/>
+	            			<field name="press_2"/>
+	            			<field name="press_3"/>
+	            			<field name="press_4"/>
+	            			<field name="press_5"/>
+	            			<field name="press_6"/>
+	            			<field name="press_7"/>
+	            		</tree>	
+	            		<form>
+	            			<group>
+	            				<field name="shift"/>
+		            			<field name="press_1"/>
+		            			<field name="press_2"/>
+		            			<field name="press_3"/>
+		            			<field name="press_4"/>
+		            			<field name="press_5"/>
+		            			<field name="press_6"/>
+		            			<field name="press_7"/>
+	            			</group>
+	            		</form>
+	            	</field>
+				</page>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+	            <button class="oe_stat_button" type="object" name="action_open_gits"
+	                    attrs="{'invisible': [('git_picking_count', '=', 0)]}">
+	                 <div class="o_stat_info">
+	                     <field name="git_picking_count" invisible="1" widget="statinfo"/>
+	                     <span class="o_stat_text">
+								Stock Requests
+                         </span>
+                         <span class="o_stat_value">
+                             <field name="stock_request_state"/>
+	                     </span>
+                     </div>
+	            </button>
+	            <button class="oe_stat_button" type="object" name="action_open_wips"
+	                    attrs="{'invisible': [('wip_picking_count', '=', 0)]}">
+	                 <div class="o_stat_info">
+	                     <field name="wip_picking_count" invisible="1" widget="statinfo"/>
+	                     <span class="o_stat_text">
+								Stock Receipts
+                         </span>
+                         <span class="o_stat_value">
+                             <field name="stock_accept_state"/>
+	                     </span>
+                     </div>
+	            </button>
+	       	</xpath>
+
+        </field>
+    </record>
+    
+    <record id="mrp.view_mrp_production_filter" model="ir.ui.view">
+            <field name="name">mrp.production.select</field>
+            <field name="model">mrp.production</field>
+            <field name="arch" type="xml">
+                <search string="Search Production">
+                    <field name="name" string="Manufacturing Order" filter_domain="['|', ('name', 'ilike', self), ('origin', 'ilike', self)]"/>
+                    <field name="product_id"/>
+                    <field name="product_variant_attributes" invisible="1"/>
+                    <field name="move_raw_ids" string="Component" filter_domain="[('move_raw_ids.product_id', 'ilike', self)]"/>
+                    <field name="name" invisible="1" string="Work Center" filter_domain="[('bom_id.operation_ids.workcenter_id', 'ilike', self)]"/>
+                    <field name="origin" invisible="1"/>
+                    <filter string="To Do" name="todo" domain="[('state', 'in', ('draft', 'confirmed', 'progress', 'to_close'))]"
+                        help="Manufacturing Orders which are in confirmed state."/>
+                    <filter string="Starred" invisible="1" name="starred" domain="[('priority', '=', '1')]"/>
+                    <filter string="Unbuilt" name="filter_unbuilt" domain="[('unbuild_ids.state', '=', 'done')]"/>
+                    <separator/>
+                    <filter string="Draft" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Confirmed" name="filter_confirmed" domain="[('state', '=', 'confirmed')]"/>
+                    <filter string="Planned" name="filter_planned" domain="[('is_planned', '=', True)]" groups="mrp.group_mrp_routings"/>
+                    <filter string="In Progress" name="filter_in_progress" domain="[('state', '=', 'progress')]"/>
+                    <filter string="To Close" name="filter_to_close" domain="[('state', '=', 'to_close')]"/>
+                    <filter string="Done" name="filter_done" domain="[('state', '=', 'done')]"/>
+                    <filter string="Cancelled" name="filter_cancel" domain="[('state', '=', 'cancel')]"/>
+                    <separator/>
+                    <filter string="Waiting" name="waiting" domain="[('reservation_state', 'in', ('waiting', 'confirmed'))]"/>
+                    <filter string="Ready" name="filter_ready" domain="[('reservation_state', '=', 'assigned')]"/>
+                    <separator/>
+                    <filter string="Planning Issues" invisible="1" name="planning_issues" help="Late MO or Late delivery of components"
+                        domain="['|', ('delay_alert_date', '!=', False), '&amp;', ('date_deadline', '&lt;', current_date), ('state', '=', 'confirmed')]"/>
+                    <separator/>
+                    <filter invisible="1" string="Late Activities" name="activities_overdue"
+                        domain="[('my_activity_date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"
+                        help="Show all records which has next action date is before today"/>
+                    <filter invisible="1" string="Today Activities" name="activities_today"
+                        domain="[('my_activity_date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter invisible="1" string="Future Activities" name="activities_upcoming_all"
+                        domain="[('my_activity_date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter name="filter_date_planned_start" invisible="1" string="Scheduled Date" date="date_planned_start"/>
+                    <filter name="filter_plan_date" invisible="1" string="Scheduled Date: Last 365 Days" domain="[('date_planned_start', '>', (datetime.datetime.now() + relativedelta(days=-365)).to_utc().strftime('%Y-%m-%d %H:%M:%S'))]"/>
+                    <separator/>
+                    <filter string="Warnings" name="activities_exception"  invisible="1"
+                        domain="[('activity_exception_decoration', '!=', False)]"/>
+                    <group expand="0" string="Group By...">
+                        <filter string="Product" name="product" domain="[]" context="{'group_by': 'product_id'}"/>
+                        <filter string="Status" name="status" domain="[]" context="{'group_by': 'state'}"/>
+                        <filter string="Material Availability" invisible="1" name="groupby_reservation_state" domain="[]" context="{'group_by': 'reservation_state'}"/>
+                        <filter string="Procurement Group" invisible="1" name="procurement_group_id" domain="[]" context="{'group_by': 'procurement_group_id'}"/>
+                        <filter string="Date" name="scheduled_date" domain="[]" context="{'group_by': 'date_planned_start'}" help="Scheduled Date by Month"/>
+                    </group>
+               </search>
+            </field>
+        </record>
+    
+    <record id="view_mrp_production_filter" model="ir.ui.view">
+        <field name="name">mrp.production.search</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.view_mrp_production_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+            	<field name="categ_id"/>
+            	<field name="product_group1_id"/>
+            	<field name="product_group2_id"/>
+            	<field name="product_group3_id"/>
+            </xpath>
+            <xpath expr="//filter[@name='product']" position="before">
+            	<filter string='Category' name="group_by_categ" context="{'group_by': 'categ_id'}"/>
+            	<filter string='Group1' name="group_g1" context="{'group_by': 'product_group1_id'}"/>
+            	<filter string='Group2' name="group_g2" context="{'group_by': 'product_group2_id'}"/>
+            	<filter string='Group3' name="group_g3" context="{'group_by': 'product_group3_id'}"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="mrp.mrp_production_tree_view" model="ir.ui.view">
+            <field name="name">mrp.production.tree</field>
+            <field name="model">mrp.production</field>
+            <field name="arch" type="xml">
+                <tree string="Manufacturing Orders" multi_edit="1" sample="1" decoration-info="state == 'draft'">
+                    <header>
+                        <button name="button_plan" type="object" string="Plan"/>
+                        <button name="do_unreserve" type="object" string="Unreserve"/>
+                        <button name="action_cancel" type="object" string="Cancel"/>
+                    </header>
+                    <field name="company_id" invisible="1"/>
+                    <field name="product_uom_category_id" invisible="1"/>
+                    <field name="priority" invisible="1" optional="show" widget="priority" nolabel="1"/>
+                    <field name="message_needaction" invisible="1"/>
+                    <field name="name" decoration-bf="1"/>
+                    <field name="date_planned_start" string="Date"/>
+                    <field name="date_deadline" invisible="1" widget="remaining_days" attrs="{'invisible': [('state', 'in', ['done', 'cancel'])]}" optional="hide"/>
+                    <field name="product_id" readonly="1" optional="show"/>
+                    <field name="lot_producing_id" optional="hide"/>
+                    <field name="bom_id" readonly="1" optional="hide"/>
+                    <field name="activity_ids" invisible="1" string="Next Activity" widget="list_activity" optional="show"/>
+                    <field name="origin" invisible="1" optional="show"/>
+                    <field name="user_id" invisible="1" optional="hide" widget="many2one_avatar_user"/>
+                    <field name="components_availability_state" invisible="1" options='{"lazy": true}'/>
+                    <field name="components_availability" options='{"lazy": true}'
+                        attrs="{'invisible': [('state', 'not in', ['confirmed', 'progress'])]}"
+                        optional="show"
+                        decoration-success="reservation_state == 'assigned' or components_availability_state == 'available'"
+                        decoration-warning="reservation_state != 'assigned' and components_availability_state in ('expected', 'available')"
+                        decoration-danger="reservation_state != 'assigned' and components_availability_state == 'late'"/>
+                    <field name="reservation_state" optional="hide" decoration-danger="reservation_state == 'confirmed'" decoration-success="reservation_state == 'assigned'"/>
+                    <field name="product_qty" sum="Total Qty" string="Quantity" readonly="1" optional="show"/>
+                    <field name="product_uom_id" string="UoM" readonly="1" options="{'no_open':True,'no_create':True}" groups="uom.group_uom" optional="show"/>
+                    <field name="production_duration_expected" invisible="1" attrs="{'invisible': [('production_duration_expected', '=', 0)]}" groups="mrp.group_mrp_routings" widget="float_time" sum="Total expected duration" optional="show"/>
+                    <field name="production_real_duration" invisible="1" attrs="{'invisible': [('production_real_duration', '=', 0)]}" groups="mrp.group_mrp_routings" widget="float_time" sum="Total real duration" optional="show"/>
+                    <field name="company_id" invisible="1" readonly="1" groups="base.group_multi_company" optional="show"/>
+                    <field name="state"
+                           decoration-success="state in ('done', 'to_close')"
+                           decoration-warning="state == 'progress'"
+                           decoration-info="state == 'confirmed'"
+                           decoration-danger="state == 'cancel'"
+                           decoration-muted="state == 'draft'"
+                           optional="show" widget="badge" class="text-dark"/>
+                    <field name="activity_exception_decoration" invisible="1" widget="activity_exception"/>
+                    <field name="delay_alert_date" invisible="1"/>
+                    <field nolabel="1" name="json_popover" widget="stock_rescheduling_popover" attrs="{'invisible': [('json_popover', '=', False)]}"/>
+                </tree>
+            </field>
+        </record>
+        
+    <record id="mrp_production_tree_view" model="ir.ui.view">
+        <field name="name">mrp.production.search</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="before">
+            	<field name="login_user_id" invisible="1"/>
+            	<field name="unit_cost" groups="etl_base.group_tech,etl_base.group_tech_admin"/>
+            	<field name="fg_move_count" groups="etl_base.group_tech"/>
+            </xpath>
+            <xpath expr="//header/button[@name='action_cancel']" position="after">
+                <button name="mrp_svl_correction" type="object" string="Valuation Correction" groups="etl_base.group_tech_admin,etl_base.group_tech" invisible="0"/>
+                
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="mrp_bom_form_view" model="ir.ui.view">
+        <field name="name">mrp.bom.form</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_id']" position="after">
+            	<field name="login_user_id" invisible="1"/>
+            	<field name="alt_product_ids" widget="many2many_tags" attrs="{'invisible': [('login_user_id', '!=', 2)]}"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="mrp_unbuild_form_view" model="ir.ui.view">
+        <field name="name">mrp.unbuild.form</field>
+        <field name="model">mrp.unbuild</field>
+        <field name="inherit_id" ref="mrp.mrp_unbuild_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_validate']" position="after">
+            	<button name="action_fm_unbuild" string="Unbuild (F)" type="object" states="done" invisible="1" class="oe_highlight"/>
+            	<button name="action_rm_unbuild" string="Unbuild (C)" type="object" states="done" invisible="1" class="oe_highlight"/>
+            </xpath>
+        </field>
+    </record>
+    
+    
+    <template id="stock.report_stock_body_print">
+        <div class="container o_stock_reports_page o_stock_reports_no_print">
+            <span class="text-start">
+                <h3>
+                    Traceability Report
+                    <span t-if="reference" style="margin-left:28%">
+                        Reference: <t t-esc="reference"/>
+                    </span>
+                </h3>
+            </span>
+            <hr/>
+            <div class="o_stock_reports_table table-responsive">
+                <table class="table" style="border-spacing:14px">
+                    <thead>
+                        <tr class="o_report_header">
+                            <th class="o_report_line_header">Reference</th>
+                            <th class="o_report_line_header">Product</th>
+                            <th class="o_report_line_header">Date</th>
+                            <th class="o_report_line_header">Lot/Serial #</th>
+                            <th class="o_report_line_header">From</th>
+                            <th class="o_report_line_header">To</th>
+                            <th class="o_report_line_header">BoM Qty</th>
+                            <th class="o_report_line_header">Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-set="space_td" t-value="'margin-left: 0'"/>
+                        <t t-foreach="lines" t-as="a">
+                            <t t-set="space_td" t-value="'margin-left: '+ str(a['level']) + 'px;'"/>
+                            <t t-set="trclass" t-value="'o_stock_reports_default_style'"/>
+                            <t t-if="a.get('model') == 'stock.move.line'"><t t-set="trclass" t-value="'o_stock_reports_level0'"/></t>
+                            <t t-set="column" t-value="0" />
+                            <tr t-att-data-id="a['id']" t-att-data-model="a['model']" t-att-class="trclass">
+                                <t t-set="tdclass" t-value="''" />
+                                <t t-if="a.get('unfoldable')"><t t-set="tdclass" t-value="'o_stock_reports_unfoldable'" /></t>
+                                <t t-set="column" t-value="0" />
+                                <t t-foreach="a['columns']" t-as="c">
+                                    <t t-set="column" t-value="column + 1" />
+                                    <td>
+                                        <t t-if="column == 1">
+                                            <span t-att-style="space_td"></span>
+                                        </t>
+                                        <span>
+                                            <t t-esc="c" />
+                                        </span>
+                                    </td>
+                                </t>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+                <br/>
+            </div>
+        </div>
+    </template>
+    
+    <template id="stock.report_stock_inventory">
+        <div class="container-fluid o_stock_reports_page o_stock_reports_no_print">
+            <span t-if="lines" class="o_report_heading text-start"><h1>Traceability Report</h1></span>
+            <span><t t-esc="context"/></span>
+            <div class="o_stock_reports_table table-responsive">
+                <t t-if="not lines">
+                    <span class="text-center"><h1>No operation made on this lot.</h1></span>
+                </t>
+                <t t-if="lines">
+                    <table class="table">
+                        <thead>
+                            <tr class="o_report_header">
+                                <th class="o_report_line_header">Reference</th>
+                                <th class="o_report_line_header">Product</th>
+                                <th class="o_report_line_header">Date</th>
+                                <th class="o_report_line_header">Lot/Serial #</th>
+                                <th class="o_report_line_header">From</th>
+                                <th class="o_report_line_header">To</th>
+                                <th class="o_report_line_header">BoM Qty</th>
+                                <th class="o_report_line_header">Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-call="stock.report_mrp_line"/>
+                        </tbody>
+                    </table>
+                </t>
+            </div>
+        </div>
+    </template>
+    
+    
+    <template id="mrp_account_enterprise.mrp_cost_structure">
+        <t t-call="web.basic_layout">
+            <t t-call-assets="mrp_account_enterprise.assets_mrp_cost_structure_report" t-js="False"/>
+            <div class="page o_mrp_report_page">
+                <t t-if="not lines">
+                    <span class="text-center o_mrp_report_info"><h1>Some of the Manufacturing Order(s) selected are not done yet</h1></span>
+                </t>
+                <t t-else="">
+                    <span class="text-start"><h1 class="o_mrp_header o_mrp_header1">Cost Analysis Report</h1></span>
+                </t>
+                <t t-foreach="lines" t-as="line">
+                    <t t-set="currency" t-value="line['currency']"/>
+                    <t t-set="tot_scrap_cost" t-value="0.0"/>
+
+                    <!-- Title -->
+                    <br/>
+                    <strong class="o_mrp_report_info">
+                        <strong t-esc="line['product'].display_name"/>, <t t-esc="line['mo_qty']"/> <t t-esc="line['product'].uom_id.name"/>, from <t t-esc="line['mocount']"/> manufacturing order(s).
+                    </strong>
+                    <t t-if="line['byproduct_moves']">
+                        <h3 class="o_mrp_header">By product(s)</h3>
+                    </t>
+                    <div t-foreach="line['qty_by_byproduct'].items()" t-as="byproduct">
+                        <td>
+                            <span t-esc="byproduct[0].name"/>
+                        </td>
+                        <td class="text-end">
+                            <span t-esc="byproduct[1]"/>
+                            <span groups="uom.group_uom" t-esc="byproduct[0].uom_id.name"/>
+                        </td>
+                    </div>
+                    <div><br/></div>
+
+                    <!-- Cost Structure table -->
+                    <h3 class="o_mrp_header o_mrp_table_header">Cost of Components</h3>
+                    <table class="table table-sm o_mrp_report_table">
+                        <thead>
+                            <tr class="o_mrp_report_header">
+                                <th class="o_mrp_report_line_header"><span>Components</span></th>
+                                <th class="text-end o_mrp_report_line_header"><span>Quantity</span></th>
+                                <th class="text-end o_mrp_report_line_header"><span>Unit Cost</span></th>
+                                <th class="text-end o_mrp_report_line_header"><span>Total Cost</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="line['raw_material_moves']" t-as="m" class="text-muted">
+                                <td>
+                                    <span
+                                        class="o_mrp_reports_web_action" t-esc="m['product_id'].display_name" view-type="form"
+                                        t-att-res-id="m['product_id'].id"
+                                        res-model="product.product"/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-esc="m['qty']" t-options='{"widget": "float", "decimal_precision": "Product Unit of Measure"}'/>
+                                    <span t-esc="m['product_id'].uom_id.name"/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-esc="m['unit_cost']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                </td>
+                                <td class="text-end">
+                                    <span t-esc="m['cost']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end">
+                                    <strong>Total Cost of Components</strong>
+                                </td>
+                                <td class="text-end">
+                                    <strong t-esc="line['total_cost_components']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                </td>
+                            </tr>
+                            <tr t-if="not line['qty_by_byproduct_w_costshare'] and line['mo_qty'] &gt; 1" >
+                                <td colspan="3" class="text-end">
+                                    <strong>Cost of Components / Unit(in <t t-esc="line['product'].uom_id.name"/>)</strong>
+                                </td>
+                                <td class="text-end">
+                                    <span t-esc="line['total_cost_components'] / line['mo_qty']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Cost of Operations table -->
+                    <t t-if="line['operations']" name="operations">
+                        <h3 class="o_mrp_header o_mrp_table_header">Cost of Operations</h3>
+                        <table class="table table-sm o_mrp_report_table">
+                            <thead>
+                                <tr class="o_mrp_report_header">
+                                    <th class="o_mrp_report_line_header"><span>Resource</span></th>
+                                    <th class="o_mrp_report_line_header"><span>Operation</span></th>
+                                    <th class="text-end o_mrp_report_line_header"><span>Working Time</span></th>
+                                    <th class="text-end o_mrp_report_line_header"><span>Cost/hour</span></th>
+                                    <th class="text-end o_mrp_report_line_header"><span>Total Cost</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="line['operations']" t-as="row" class="text-muted">
+                                    <td>
+                                        <span t-esc="row[0]"/>
+                                    </td>
+                                    <td>
+                                        <span t-if="row[1]" class="o_mrp_reports_web_action" t-att-res-id="row[1]" res-model="mrp.routing.workcenter" view-type="form" t-esc="row[2]"/>
+                                        <span t-else="" t-esc="row[2]"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span> <t t-esc="row[3]" t-options='{"widget": "float", "precision": 4}'/> hours</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="row[4]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="row[3] * row[4]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" class="text-end">
+                                        <strong>Total Cost of Operations</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong t-esc="line['total_cost_operations']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                </tr>
+                                <tr t-if="not line['qty_by_byproduct_w_costshare'] and line['mo_qty'] &gt; 1">
+                                    <td colspan="4" class="text-end">
+                                        <strong>Cost of Operations per unit (in <t t-esc="line['product'].uom_id.name"/>)</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="line['total_cost_operations'] / line['mo_qty']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+
+                    <t t-if="line['scraps']">
+                        <h3 class="o_mrp_header o_mrp_table_header">Cost of Scraps</h3>
+                        <table class="table table-sm o_mrp_report_table">
+                            <thead>
+                                <tr class="o_mrp_report_header">
+                                    <th class="o_mrp_report_line_header"><span>Scraps</span></th>
+                                    <th class="text-end o_mrp_report_line_header"><span>Quantity</span></th>
+                                    <th class="text-end o_mrp_report_line_header"><span>Unit Cost</span></th>
+                                    <th class="text-end o_mrp_report_line_header"><span>Total Cost</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="line['scraps']" t-as="scrap"
+                                class="text-success">
+                                    <td>
+                                        <span class="o_mrp_reports_web_action" t-att-res-id="scrap.id" res-model="stock.move" view-type="form" t-esc="scrap.product_id.display_name"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span><t t-esc="scrap.product_qty"/> <t t-esc="scrap.product_id.uom_id.name"/></span>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="scrap.stock_valuation_layer_ids.unit_cost" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="scrap.stock_valuation_layer_ids.value" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+
+                                    <t t-set="tot_scrap_cost" t-value="tot_scrap_cost + scrap.stock_valuation_layer_ids.value"/>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end">
+                                        <strong>Total Cost of Scraps</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="tot_scrap_cost" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+
+                    <!-- Cost table -->
+                    <div class="row">
+                        <div class="col-6 offset-6">
+                            <table class="table table-sm o_mrp_report_table">
+                                <tr>
+                                    <td class="text-end">
+                                        <strong>Conversion Cost / Unit</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong t-esc="line['conversion_cost']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                </tr>
+                                <tr t-if="not line['qty_by_byproduct_w_costshare']">
+                                    <td class="text-end">
+                                        <strong>Production Cost / Unit (in <t t-esc="line['product'].uom_id.name"/>)</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="line['unit_cost']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end">
+                                        <strong>Total Production Cost</strong>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong t-esc="line['total_cost']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <t t-if="line['qty_by_byproduct_w_costshare']">
+                        <h3 class="o_mrp_header o_mrp_table_header">Cost Breakdown of Products</h3>
+                        <table class="table table-sm o_mrp_report_table">
+                            <thead>
+                                <tr class="o_mrp_report_header">
+                                    <th class="o_mrp_report_line_header"><span>Product</span></th>
+                                    <th class="text-end o_mrp_report_line_header"><span>Avg Cost of Components Per Unit</span></th>
+                                    <th t-if="line['operations']" class="text-end o_mrp_report_line_header"><span>Avg Cost of Operations Per Unit</span></th>
+                                    <th class="text-end o_mrp_report_line_header"><span>Avg Total Cost Per Unit</span></th>
+                                    <th class="o_mrp_report_line_header text-end" groups="uom.group_uom"><span>Unit of Measure</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="text-muted">
+                                    <td>
+                                        <span t-esc="line['product'].name"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="line['component_cost_by_product'][line['product']] / line['mo_qty']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                    <td t-if="line['operations']" class="text-end">
+                                        <span t-esc="line['operation_cost_by_product'][line['product']] / line['mo_qty']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="line['total_cost_by_product'][line['product']] / line['mo_qty']" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                    <td groups="uom.group_uom" class="text-end">
+                                        <span t-esc="line['product'].uom_id.name"/>
+                                    </td>
+                                </tr>
+                                <tr t-foreach="line['qty_by_byproduct_w_costshare'].items()" t-as="byproduct" class="text-muted">
+                                    <td>
+                                        <span t-esc="byproduct[0].name"/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="line['component_cost_by_product'][byproduct[0]] / byproduct[1]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                    <td t-if="line['operations']" class="text-end">
+                                        <span t-esc="line['operation_cost_by_product'][byproduct[0]] / byproduct[1]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                    <td class="text-end">
+                                        <span t-esc="line['total_cost_by_product'][byproduct[0]] / byproduct[1]" t-options='{"widget": "monetary", "display_currency": currency}'/>
+                                    </td>
+                                    <td groups="uom.group_uom" class="text-end">
+                                        <span t-esc="byproduct[0].uom_id.name"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </t>
+                </t>
+            </div>
+        </t>
+    </template>
+</data></odoo>

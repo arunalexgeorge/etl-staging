@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="paperformat_ledger" model="report.paperformat">
+	        <field name="name">Ledger</field>
+	        <field name="default" eval="True" />
+	        <field name="format">A4</field>
+	        <field name="orientation">Portrait</field>
+	        <field name="margin_top">10.00</field>
+	        <field name="margin_bottom">10.00</field>
+	        <field name="margin_left">7.0</field>
+	        <field name="margin_right">7.0</field>
+	        <field name="header_line" eval="False" />
+	        <field name="header_spacing">20</field>
+	        <field name="dpi">90</field>
+    	</record>
+        
+        
+        <record id="action_report_legder" model="ir.actions.report">
+            <field name="name">Ledger</field>
+            <field name="model">partner.ledger</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">etl_account.report_partner_ledger</field>
+            <field name="report_file">etl_account.report_partner_ledger</field>
+            <field name="binding_model_id" eval="False"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="etl_account.paperformat_ledger"/>
+        </record>
+		
+		
+		<template id="external_layout_ledger">
+            <t t-if="not o" t-set="o" t-value="doc"/>
+            <t t-set="company" t-value="res_company"/>
+            	
+            <div t-attf-class="article o_report_layout_boxed o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}" t-attf-style="background-image: url({{ 'data:image/png;base64,%s' % company.layout_background_image.decode('utf-8') if company.layout_background_image and company.layout_background == 'Custom' else '/base/static/img/bg_background_template.jpg' }});" t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+                <div class="pt-15">
+                    <t t-call="web.address_layout"/>
+                </div>
+                <t t-out="0"/>
+            </div>
+
+            <div t-attf-class="footer o_boxed_footer o_company_#{company_id}_layout">
+                <table class="table-borderless" width="100%">
+	                <tr>
+	                	<td width="100%" style="text-align:center;font-size:12px">
+	                        <span>
+	                            <ul class="list-inline">
+	                                <li>Page<span class="page" /> of <span class="topage" /></li>
+	                            </ul>
+	                        </span>
+	                    </td>
+	                </tr>
+            	</table>
+            </div>
+        </template>
+        
+        <template id="report_partner_ledger_document">
+            <t t-call="etl_account.external_layout_ledger">
+                <t t-set="o" t-value="o.with_context(lang=lang)"/>
+                <div class="page">
+                    <table width="100%" style="border:0px solid white;background-color: #FFFFFF;">
+                    	<tr>
+                    		<td width="30%" style="border:0px solid white;"></td>
+                    		<td width="40%" style="border:0px solid white;font-size:15px;text-align:center;"><strong><span t-field="o.company_id.name"/></strong></td>
+                    		<td width="30%" style="border:0px solid white;background-color: #FFFFFF;"></td>
+                    	</tr>
+                    	<tr>
+                    		<td width="30%" style="border:0px solid white;"></td>
+                    		<td width="40%" style="border-left:0px solid white;border-right:0px solid white;border-bottom:1px solid black;font-size:15px;text-align:center;"><strong><span t-field="o.branch_id.address"/></strong></td>
+                    		<td width="30%" style="border:0px solid white;background-color: #FFFFFF;"></td>
+                    	</tr>
+                        <tr>
+                    		<td width="30%" style="border:0px solid white;"></td>
+                    		<td width="40%" style="padding-bottom:10px;font-size:15px;text-align:center;border:0px solid white;background-color: #FFFFFF;"><strong><br/><span t-field="o.partner_id.name"/></strong></td>
+                    		<td width="30%" style="border:0px solid white;background-color: #FFFFFF;"></td>
+                    	</tr>
+                    	<t t-if="o.type=='ledger'">
+	                    	<tr>
+	                    		<td width="30%" style="border:0px solid white;"></td>
+	                    		<td width="40%" style="font-size:15px;text-align:center;border:0px solid white;background-color: #FFFFFF;">Ledger Account</td>
+	                    		<td width="30%" style="border:0px solid white;background-color: #FFFFFF;"></td>
+	                    	</tr>
+	                    </t>
+	                    <t t-if="o.type=='overdue'">
+	                    	<tr>
+	                    		<td width="30%" style="border:0px solid white;"></td>
+	                    		<td width="40%" style="font-size:15px;text-align:center;border:0px solid white;background-color: #FFFFFF;">Bill-wise Details</td>
+	                    		<td width="30%" style="border:0px solid white;background-color: #FFFFFF;"></td>
+	                    	</tr>
+	                    </t>
+	                    <t t-if="o.type=='monthly'">
+	                    	<tr>
+	                    		<td width="30%" style="border:0px solid white;"></td>
+	                    		<td width="40%" style="font-size:15px;text-align:center;border:0px solid white;background-color: #FFFFFF;">Monthly Summary</td>
+	                    		<td width="30%" style="border:0px solid white;background-color: #FFFFFF;"></td>
+	                    	</tr>
+	                    </t>
+	                    <tr>
+	                    	<td width="30%" style="border:0px solid white;"></td>
+	                    	<td width="40%" style="font-size:15px;text-align:center;border:0px solid white;background-color: #FFFFFF;"><span t-field="o.start_date"/> To <span t-field="o.end_date"/></td>
+	                    	<td width="30%" style="border:0px solid white;background-color: #FFFFFF;"></td>
+	                    </tr>
+                    </table>
+                    <t t-if="o.type=='ledger'">
+	                    <table style="font-size:12px;border-right:0px solid white;border-left:0px solid white;" width="100%">
+	                        <tr>
+	                            <td width="20%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:center;"><span>Date</span></td>
+	                            <td width="30%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:center;">Particulars</td>
+	                            <td width="10%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:center;">Voucher Type</td>
+	                            <td width="10%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:center;"><span>Voucher No</span></td>
+	                            <td width="15%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:right;padding-right:5px;"><span>Debit</span></td>
+	                            <td width="15%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:right;padding-right:5px;"><span>Credit</span></td>
+	                        </tr>
+	                        <tr>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"><span t-field="o.start_date"/></td>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"><span>Opening Balance</span></td>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"></td>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"></td>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;"><span t-esc="o.get_opening_value_debit()"/></td>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;"><span t-esc="o.get_opening_value_credit()"/></td>
+	                       	</tr>
+	                        <t t-foreach="o.line_ids" t-as="line">
+	                            <tr>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"><span t-field="line.date"/></td>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"><span t-field="line.name"> </span></td>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"><span t-field="line.voucher_type"></span></td>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"><span t-field="line.move_id.name"></span></td>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;"><span t-esc="line.get_formatted_value(line.debit)"/></td>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;"><span t-esc="line.get_formatted_value(line.credit)"/></td>
+	                            </tr>
+	                        </t>
+	                        <tr>
+		                        <td style="border-bottom:0px solid white;border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"></td>
+		                        <td style="border-bottom:0px solid white;border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"><span>Closing Balance</span></td>
+		                        <td style="border-bottom:0px solid white;border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"></td>
+		                        <td style="border-bottom:0px solid white;border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"></td>
+		                        <td style="border-bottom:0px solid white;border-right:0px solid white;background-color: #FFFFFF;border-top:1px solid black;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;"><span t-esc="o.get_closing_value_debit()"/></td>
+		                        <td style="border-bottom:0px solid white;border-right:0px solid white;background-color: #FFFFFF;border-top:1px solid black;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;"><span t-esc="o.get_closing_value_credit()"/></td>
+	                       	</tr>
+	                	</table>
+                	</t>
+                	<t t-if="o.type=='overdue'">
+	                    <table style="font-size:12px;border-right:0px solid white;border-left:0px solid white;" width="100%">
+	                        <tr>
+	                            <td width="20%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:center;"><span>Date</span></td>
+	                            <td width="10%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:center;">Voucher No</td>
+	                            <td width="20%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:right;">Opening Amount</td>
+	                            <td width="20%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:right;"><span>Pending Amount</span></td>
+	                            <td width="15%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:center;"><span>Due Date</span></td>
+	                            <td width="15%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:center;"><span>Due Days</span></td>
+	                        </tr>
+	                        <tr>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"><span t-field="o.start_date"/></td>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"><span>Opening Balance</span></td>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;"><span t-esc="o.get_opening_value_debit_due()"/></td>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;"></td>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"></td>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"></td>
+	                       	</tr>
+	                        <t t-foreach="o.line_ids" t-as="line">
+	                            <tr>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"><span t-field="line.date"/></td>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"><span t-field="line.move_id.name"> </span></td>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;text-align:right;"><span t-esc="line.get_due_formatted_value(line.opening_amount)"></span></td>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;text-align:right'"><span t-esc="line.get_due_formatted_value(line.pending_amount)"></span></td>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;text-align:center;"><span t-field="line.due_date"/></td>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;text-align:center;"><span t-esc="line.get_due_days()"/></td>
+	                            </tr>
+	                        </t>
+	                        <tr>
+		                        <td style="border-bottom:0px solid white;border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"></td>
+		                        <td style="border-bottom:0px solid white;border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"></td>
+		                        <td style="border-bottom:0px solid white;border-right:0px solid white;background-color: #FFFFFF;border-top:1px solid black;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;"><span t-esc="o.get_total_opening()"/></td>
+		                        <td style="border-bottom:0px solid white;border-right:0px solid white;background-color: #FFFFFF;border-top:1px solid black;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;"><span t-esc="o.get_total_pending()"/></td>
+		                        <td style="border-bottom:0px solid white;border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"></td>
+		                        <td style="border-bottom:0px solid white;border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"></td>
+	                       	</tr>
+	                	</table>
+                	</t>
+                	<t t-if="o.type=='monthly'">
+	                    <table style="font-size:12px;border-right:0px solid white;border-left:0px solid white;" width="100%">
+	                        <tr>
+	                            <td width="40%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;"></td>
+	                            <td width="30%" colspan="2" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;border-left:1px solid black;border-right:1px solid black;text-align:center;">Transactions</td>
+	                            <td width="30%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;"></td>
+	                        </tr>
+	                        <tr>
+	                            <td width="40%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:center;border-top:0px solid black;"></td>
+	                            <td width="15%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;border-top:0px solid black;border-left:1px solid black;text-align:right;padding-right:15px;">Debit</td>
+	                            <td width="15%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;border-right:1px solid black;border-left:1px solid black;text-align:right;padding-right:15px;">Credit</td>
+	                            <td width="30%" style="border-right:0px solid white;background-color: #FFFFFF;color: #000000;background-color: #FFFFFF;border-bottom:1px solid black;text-align:right;border-top:0px solid black;padding-right:25px;">Closing Balance</td>
+	                        </tr>
+	                        <tr>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"><span>Opening Balance</span></td>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"></td>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;"></td>
+		                        <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;padding-right:25px;"><span t-esc="o.get_opening_value_monthly()"/></td>
+	                       	</tr>
+	                        <t t-foreach="o.line_ids" t-as="line">
+	                            <tr>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"><span t-field="line.month"/></td>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;text-align:right;padding-right:25px;"><span t-esc="line.get_formatted_value(line.debit)"></span></td>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;text-align:right;padding-right:25px;"><span t-esc="line.get_formatted_value(line.credit)"></span></td>
+	                                <td style="border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;text-align:right;padding-right:25px;"><span t-esc="line.get_due_formatted_value(line.closing_balance)"></span></td>
+	                            </tr>
+	                        </t>
+	                        <tr>
+		                        <td style="border-bottom:0px solid white;border-top:1px solid black;border:0px solid white;background-color: #FFFFFF;color: #000000;padding-left:5px;background-color: #FFFFFF;"><strong>Grand Total</strong></td>
+		                        <td style="border-bottom:0px solid white;border-right:0px solid white;background-color: #FFFFFF;border-top:1px solid black;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;padding-right:25px;"><span t-esc="o.get_monthly_debit()"/></td>
+		                        <td style="border-bottom:0px solid white;border-right:0px solid white;background-color: #FFFFFF;border-top:1px solid black;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;padding-right:25px;"><span t-esc="o.get_monthly_credit()"/></td>
+		                        <td style="border-bottom:0px solid white;border-right:0px solid white;background-color: #FFFFFF;border-top:1px solid black;color: #000000;padding-right:5px;text-align:right;background-color: #FFFFFF;padding-right:25px;"><span t-esc="o.get_monthly_total()"/></td>
+	                       	</tr>
+	                	</table>
+                	</t>
+                </div>
+            </t>
+        </template>
+
+        <template id="report_partner_ledger">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-call="etl_account.report_partner_ledger_document" t-lang="lang"/>
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

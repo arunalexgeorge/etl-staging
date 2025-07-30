@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="action_report_grn_qc" model="ir.actions.report">
+            <field name="name">GRN QC</field>
+            <field name="model">grn.qc</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">etl_quality.report_grn_qc</field>
+            <field name="report_file">etl_quality.report_grn_qc</field>
+            <field name="print_report_name">'GRN QC - %s' % object.name </field>
+            <field name="binding_model_id" eval="False"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <record id="action_report_mo_qc" model="ir.actions.report">
+            <field name="name">MO QC</field>
+            <field name="model">mo.qc</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">etl_quality.report_mo_qc</field>
+            <field name="report_file">etl_quality.report_mo_qc</field>
+            <field name="print_report_name">'MO QC - %s' % object.name </field>
+            <field name="binding_model_id" eval="False"/>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>

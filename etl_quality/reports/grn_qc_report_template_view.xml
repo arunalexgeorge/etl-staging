@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_grn_document">
+            <t t-call="web.external_layout">
+                <t t-set="o" t-value="o.with_context(lang=lang)" />
+                <div class="page">
+                    <div class="text-center">
+                        <div style="text-align: center;font-size:18px;">
+                            <b><strong>GRN QC</strong></b>
+                        </div>
+                        <div class="row mt-4 mb-4" style="font-size:14px;">
+                            <div class="col-auto col-3 mw-100 mb-2">
+                                <strong>Product:</strong>
+                                <p class="m-0" t-field="o.product_id"/>
+                            </div>
+                            <div class="col-auto col-3 mw-100 mb-2">
+                                <strong>GRN No:</strong>
+                                <p class="m-0" t-field="o.picking_id"/>
+                            </div>
+                            <div class="col-auto col-3 mw-100 mb-2">
+                                <strong>Purchase Order:</strong>
+                                <p class="m-0" t-field="o.purchase_id"/>
+                            </div>
+                            <div class="col-auto col-3 mw-100 mb-2">
+                                <strong>Vendor:</strong>
+                                <p class="m-0" t-field="o.partner_id"/>
+                            </div>
+                        </div>
+                        <div class="row mt-4 mb-4" style="font-size:14px;">
+                            <div class="col-auto col-3 mw-100 mb-2">
+                                <strong>Date:</strong>
+                                <p class="m-0" t-field="o.date"/>
+                            </div>
+                            <div class="col-auto col-3 mw-100 mb-2">
+                                <strong>GRN Qty:</strong>
+                                <p class="m-0" t-field="o.grn_qty"/>
+                            </div>
+                            <div class="col-auto col-3 mw-100 mb-2">
+                                <strong>Accept Qty:</strong>
+                                <p class="m-0" t-field="o.accept_qty"/>
+                            </div>
+                            <div class="col-auto col-3 mw-100 mb-2">
+                                <strong>Reject Qty:</strong>
+                                <p class="m-0" t-field="o.reject_qty"/>
+                            </div>
+                        </div>
+                        <table width="100%" class="table table-sm o_main_table table-borderless">
+                            <thead>
+                                <tr width="100%">
+                                    <th><span>Parameter</span></th>
+                                    <th><span>Specification</span></th>
+                                    <th><span>Result Value</span></th>
+                                    <th><span>Test Result</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.line_ids" t-as="line">
+                                    <tr width="100%">
+                                        <td><span t-field="line.name"/></td>
+                                        <td><span t-field="line.specification"/></td>
+                                        <td><span t-field="line.result_value"/></td>
+                                        <td><span t-field="line.result"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <br/>
+                        <br/>
+                        <div style="text-align: left;font-size:15px;">
+                            <strong>Remarks:</strong>
+                            <span t-field="o.remarks"/>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+
+        <template id="report_grn_qc">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-set="lang" t-value="o.partner_id.lang"/>
+                    <t t-call="etl_quality.report_grn_document" t-lang="lang" />
+                </t>
+            </t>
+        </template>
+    </data>
+</odoo>

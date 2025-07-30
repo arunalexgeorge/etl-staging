@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="data_qc_grn" model="qc.overview">
+            <field name="name">GRN</field>
+            <field name="type">grn</field>
+        </record>
+        
+        <record id="data_qc_mo" model="qc.overview">
+            <field name="name">MO</field>
+            <field name="type">mo</field>
+        </record>
+
+    </data>
+</odoo>

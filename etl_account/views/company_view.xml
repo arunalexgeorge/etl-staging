@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<data>
+    
+	    <record id="view_company_form_inherit" model="ir.ui.view">
+	        <field name="name">res.company.form</field>
+	        <field name="model">res.company</field>
+	        <field name="inherit_id" ref="base.view_company_form"/>
+	        <field name="arch" type="xml">
+	            <xpath expr="//page[@name='general_info']" position="after">
+	            	<page string="IRN Configurations" attrs="{'invisible': [('login_user_id', '!=', 2)]}">
+	            		<group>
+	            			<group>
+			                	<field name="irn_access_token"/>
+			                	<field name="irn_url"/>
+			                	<field name="irn_eway_url"/>
+			                	<field name="eway_url"/>
+			                	<field name="legal_name"/>
+			                	<field name="trade_name"/>
+	                		</group>
+	            		</group>
+	                </page>
+	            </xpath>
+	            <xpath expr="//field[@name='currency_id']" position="after">
+	            	<field name="company_footer"/>
+	            	<field name="report_footer"/>
+	            </xpath>
+	        </field>
+	    </record>
+
+	</data>
+</odoo>

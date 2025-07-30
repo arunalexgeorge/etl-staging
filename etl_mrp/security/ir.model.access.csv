@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_change_batch_qty,change.batch.qty,model_change_batch_qty,,1,1,1,1
+access_mrp_scrap,mrp_scrap,model_mrp_scrap,,1,1,1,0
+access_mrp_scrap_line,mrp_scrap_line,model_mrp_scrap_line,,1,1,1,1
+access_mrp_serial,mrp_serial,model_mrp_serial,,1,1,1,1
+access_mrp_shift_line,mrp_shift_line,model_mrp_shift_line,,1,1,1,1
+access_ppr,ppr,model_production_planning_report,,1,1,1,1

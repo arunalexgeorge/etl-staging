@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="view_statement_import_form" model="ir.ui.view">
+            <field name="name">Statement Import</field>
+            <field name="model">statement.import</field>
+            <field name="arch" type="xml">
+                <form string="Statement Import">
+                    <group>
+                        <field name="branch_id" readonly="1" widget="selection"/>
+                        <field name="journal_id" readonly="1" widget="selection" domain="[('type', '=', 'bank')]"/>
+                        <field name="date" required="1"/>
+                        <field name="data_file" filename="data_file_name"/>
+	            		<field name="data_file_name" invisible="1"/>
+                    </group>
+                    <footer>
+                        <button name="action_import" string="Import" data-hotkey="q"
+                            colspan="1" type="object" class="btn-primary"/>
+                        <button string="Close" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_statement_import" model="ir.actions.act_window">
+            <field name="name">Statement Import</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">statement.import</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+       
+       <!-- <menuitem id="menu_statement_import" parent="account.menu_finance_reports" action="action_statement_import" sequence="101"/> -->
+       
+    </data>
+</odoo>    

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+         <record id="view_qc_overview_kanban" model="ir.ui.view">
+            <field name="name">qc.overview.kanban</field>
+            <field name="model">qc.overview</field>
+            <field name="arch" type="xml">
+                 <kanban class="oe_background_grey o_kanban_dashboard o_emphasize_colors o_stock_kanban" create="0" group_create="false">
+                    <field name="name"/>
+                    <field name="pending_count"/>
+                    <field name="ongoing_count"/>
+                    <field name="completed_count"/>
+                     <templates>
+                        <t t-name="kanban-box">
+                            <div>
+                            <div t-attf-class="oe_kanban_global_click">
+                                 <div class="o_kanban_card_header_title">
+                                      <div class="o_primary" t-if="!selection_mode">
+
+                                <div class="col-12">
+                                    <ul style="list-style-type:none; padding:0px 20px;">
+                                                <field name="name"/>
+                                    </ul>
+                                </div>
+                                </div>
+                                 </div>
+                            </div>
+                                <div class="container o_kanban_card_content" t-if="!selection_mode">
+                                    <div class="row">
+                                        <div class="col-6 o_kanban_primary_left">
+                                            <button class="btn btn-primary" name="action_open_pending"
+                                                    type="object">
+                                               <field name="pending_count"/>
+                                                <span> To Process</span>
+                                            </button>
+                                        </div>
+                                        <div class="col-6 o_kanban_primary_right">
+                                            <div class="col-12">
+                                                <a class="oe_kanban_stock_picking_type_list" name="action_open_ongoing" type="object">
+                                                	<field name="ongoing_count"/>
+                                                <span> Ongoing</span>
+                                                </a>
+                                            </div>
+                                            
+                                            <div class="col-12">
+                                                <a class="oe_kanban_stock_picking_type_list" name="action_open_completed" type="object">
+                                           			<field name="completed_count"/>
+                                                <span> Completed</span>
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </t>
+                     </templates>
+                </kanban>
+
+            </field>
+         </record>
+
+
+        <record model="ir.actions.act_window" id="action_qc_overview">
+            <field name="name">QC Overview</field>
+            <field name="res_model">qc.overview</field>
+            <field name="view_mode">kanban</field>
+        </record>
+        
+        <menuitem id="menu_qc_overview" action="action_qc_overview" name="Overview" 
+        	parent="menu_quality" sequence="0"/>
+
+    </data>
+</odoo>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <record id="approval_request_view_form_inherit" model="ir.ui.view">
+        <field name="name">approval.purchase.form.inherit</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//label[@for='date']" position="attributes">
+            	<attribute name="string">Material Required Date</attribute>
+            </xpath>
+            <xpath expr="//field[@name='product_line_ids']" position="attributes">
+            	<attribute name="attrs">{'readonly':[('purchase_order_count', '>', 0)]}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='company_id']" position="after">
+            	<field name="picking_type_id" domain="[('code', '=', 'incoming')]"
+            		options="{'no_open': True, 'no_create': True, 'no_create_edit':True}"/>
+            	<field name="branch_id" required="1"
+            		options="{'no_open': True, 'no_create': True, 'no_create_edit':True}"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="approval_category_view_form" model="ir.ui.view">
+        <field name="name">approval.category.form.inherit</field>
+        <field name="model">approval.category</field>
+        <field name="inherit_id" ref="approvals.approval_category_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='sequence_code']" position="after">
+            	<field name="picking_type_id" domain="[('code', '=', 'incoming')]"
+            		options="{'no_open': True, 'no_create': True, 'no_create_edit':True}"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="approvals_purchase.approval_purchase_request_view_form_inherit" model="ir.ui.view">
+        <field name="name">approval.purchase.request.view.form.inherit</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_get_attachment_view']" position="after">
+                <button name="action_open_purchase_orders" type="object"
+                    class="oe_stat_button" icon="fa-credit-card"
+                    attrs="{'invisible': [('purchase_order_count', '=', 0)]}">
+                    <field name="purchase_order_count" string="Purchase Orders" widget="statinfo"/>
+                </button>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm']" position="after">
+                <button name="action_create_purchase_orders" type="object"
+                    string="Create RFQ's" class="btn-primary" invisible="1"
+                    data-hotkey="g"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="approval_purchase_request_view_form_inherit" model="ir.ui.view">
+        <field name="name">approval.request.form</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_confirm']" position="after">
+                <button name="action_create_purchase_orders" type="object"
+                    string="Create RFQ's" class="btn-primary" attrs="{'invisible':[('request_status', '!=', 'approved')]}"
+                    data-hotkey="g" groups="etl_base.group_approval_edit"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

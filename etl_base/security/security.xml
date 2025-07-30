@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+        
+        <record model="ir.module.category" id="module_category_etl">
+            <field name="name">ETL Access Rights</field>
+            <field name="sequence">100</field>
+        </record>
+
+        <record id="group_purchase_confirm" model="res.groups">
+            <field name="name">Allow Purchase Order Confirmation</field>
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="sequence">1</field>
+        </record>
+        
+        <record id="group_sales_confirm" model="res.groups">
+            <field name="name">Allow Sales Order Confirmation</field>
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="sequence">2</field>
+        </record>
+        
+        <record id="group_approval_edit" model="res.groups">
+            <field name="name">Allow Vendor &amp; Price Editing in Approval</field>
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="sequence">3</field>
+        </record>
+        
+        <record id="group_product_full" model="res.groups">
+            <field name="name">Allow Product Creation &amp; Editing</field>
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="sequence">4</field>
+        </record>
+        
+        <record id="base.group_partner_manager" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">Allow Partner Creation &amp; Editing</field>
+            <field name="sequence">5</field>
+        </record>
+        
+        <record id="group_sales_margin" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">Show Sales Margin</field>
+            <field name="sequence">6</field>
+        </record>
+        
+        <record id="group_payment_confirm" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">Allow Payment Confirmation</field>
+            <field name="sequence">7</field>
+        </record>
+        
+        <record id="group_bom_qty" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">Show/Edit BoM Qty in Production</field>
+            <field name="sequence">8</field>
+        </record>
+        
+        <record id="group_qc_reset" model="res.groups">
+            <field name="name">Allow QC Reset</field>
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="sequence">9</field>
+        </record>
+        
+        <record id="group_bs_reconciliation" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">Allow Bank Statement Reconciliation</field>
+            <field name="sequence">11</field>
+        </record>
+        
+        <record id="group_invoice_editing" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">Allow Invoice/Vendor Bill Lines Editing</field>
+            <field name="sequence">12</field>
+        </record>
+        
+        <record id="group_sl_editing" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">Allow Serial Number Creation / Editing</field>
+            <field name="sequence">13</field>
+        </record>
+        
+        <record id="group_purchase_cfo" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">CFO Approval</field>
+            <field name="sequence">14</field>
+        </record>
+        
+        <record id="group_purchase_pm" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">Purchase Head Approval</field>
+            <field name="sequence">15</field>
+        </record>
+        
+        <record id="group_production_approval" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">Production Weight Approval</field>
+            <field name="sequence">16</field>
+        </record>
+        
+        <record id="group_soprice_editing" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">Allow SO Unit Price Editing</field>
+            <field name="sequence">17</field>
+        </record>
+        
+        <record id="group_poprice_editing" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">Allow PO Unit Price Editing</field>
+            <field name="sequence">18</field>
+        </record>
+        
+        <record id="group_irn_ewb" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">IRN &amp; Eway Cancellation</field>
+            <field name="sequence">19</field>
+        </record>
+        
+        <record id="group_pricelist_line" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">Allow Pricelist Line creation</field>
+            <field name="sequence">20</field>
+        </record>
+        
+        <record id="group_tech" model="res.groups">
+        	<field name="name">Technical</field>
+        	<field name="category_id" ref="base.module_category_hidden"/>
+        	<field name="sequence">100</field>
+    	</record>
+    	
+    	<record id="group_tech_admin" model="res.groups">
+        	<field name="name">Technical Manager</field>
+        	<field name="category_id" ref="base.module_category_hidden"/>
+        	<field name="sequence">101</field>
+    	</record>
+    	
+        <record id="group_auditor" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etl"/>
+            <field name="name">Auditor</field>
+            <field name="sequence">21</field>
+        </record>
+        
+        <record model="ir.module.category" id="module_category_etlaccounts">
+            <field name="name">Accounts Editing Access Rights</field>
+            <field name="sequence">101</field>
+        </record>
+        
+        <record id="group_inv_editing" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etlaccounts"/>
+            <field name="name">Customer Invoices</field>
+            <field name="sequence">0</field>
+        </record>
+        
+        <record id="group_cn_editing" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etlaccounts"/>
+            <field name="name">Customer Credit Notes</field>
+            <field name="sequence">1</field>
+        </record>
+        
+        <record id="group_vb_editing" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etlaccounts"/>
+            <field name="name">Vendor Bills</field>
+            <field name="sequence">2</field>
+        </record>
+        
+        <record id="group_dn_editing" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etlaccounts"/>
+            <field name="name">Vendor Debit Notes</field>
+            <field name="sequence">3</field>
+        </record>
+        
+        <record id="group_cp_editing" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etlaccounts"/>
+            <field name="name">Customer Payments</field>
+            <field name="sequence">4</field>
+        </record>
+        
+        <record id="group_vp_editing" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etlaccounts"/>
+            <field name="name">Vendor Payments</field>
+            <field name="sequence">5</field>
+        </record>
+        
+        <record id="group_move_editing" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_etlaccounts"/>
+            <field name="name">JVs</field>
+            <field name="sequence">6</field>
+        </record>
+        
+        <record model="ir.module.category" id="module_category_accounts_backdated">
+            <field name="name">Back-dated Entries Access</field>
+            <field name="sequence">102</field>
+        </record>
+        
+        <record id="group_backdate_1day" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_accounts_backdated"/>
+            <field name="name">1 Day</field>
+            <field name="sequence">0</field>
+        </record>
+        
+        <record id="group_backdate_3day" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_accounts_backdated"/>
+            <field name="name">3 Days</field>
+            <field name="sequence">1</field>
+            <field name="implied_ids" eval="[(4, ref('etl_base.group_backdate_1day'))]"/>
+        </record>
+
+		<record id="group_backdate_cmonth" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_accounts_backdated"/>
+            <field name="name">Current Month</field>
+            <field name="sequence">2</field>
+            <field name="implied_ids" eval="[(4, ref('etl_base.group_backdate_3day')),(4, ref('etl_base.group_backdate_1day'))]"/>
+        </record>
+        
+        <record id="group_backdate_month" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_accounts_backdated"/>
+            <field name="name">Previous Month</field>
+            <field name="sequence">3</field>
+        </record>
+        
+        <record id="group_backdate_unlimited" model="res.groups">
+            <field name="category_id" ref="etl_base.module_category_accounts_backdated"/>
+            <field name="name">Unlimited</field>
+            <field name="sequence">4</field>
+            <field name="implied_ids" eval="[(4, ref('etl_base.group_backdate_cmonth')), (4, ref('etl_base.group_backdate_month')),(4, ref('etl_base.group_backdate_3day')),(4, ref('etl_base.group_backdate_1day'))]"/>
+        </record>
+        
+    </data>
+
+</odoo>

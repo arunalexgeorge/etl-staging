@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="view_sale_register_form" model="ir.ui.view">
+            <field name="name">Sales Register</field>
+            <field name="model">sale.register</field>
+            <field name="arch" type="xml">
+                <form string="Sales Register">
+                    <group>
+                    	<group>
+                    		<field name="start_date" required="1"/>
+                    	</group>
+                    	<group>
+                    		<field name="end_date" required="1"/>
+                    	</group>
+                    </group>
+                    <group>
+                    	<field name="branch_ids" required="1" widget="many2many_tags"
+                    		options="{'no_create': True, 'no_create_edit': True}"/>
+                    </group>
+                    <footer>
+                        <button name="action_print" string="Print" data-hotkey="q"
+                            colspan="1" type="object" class="btn-primary"/>
+                        <button string="Close" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_sale_register" model="ir.actions.act_window">
+            <field name="name">Sales Register</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.register</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="view_sale_register_form"/>
+        </record>
+       
+       <menuitem id="menu_sale_report" parent="sale.sale_menu_root"
+            name="Reporting" sequence="40"/>
+            
+      <menuitem id="sale.menu_sale_report" name="Sales Analysis" 
+       		parent="menu_sale_report" sequence="0"
+            action="sale.action_order_report_all" 
+            groups="sales_team.group_sale_manager"/>
+       
+       <menuitem id="menu_sale_register" parent="menu_sale_report" action="action_sale_register" sequence="1"/>
+       
+       <record id="view_cn_form" model="ir.ui.view">
+            <field name="name">Credit Note Register</field>
+            <field name="model">sale.register</field>
+            <field name="arch" type="xml">
+                <form string="Credit Note Register">
+                    <group>
+                    	<group>
+                    		<field name="start_date" required="1"/>
+                    	</group>
+                    	<group>
+                    		<field name="end_date" required="1"/>
+                    	</group>
+                    </group>
+                    <group>
+                    	<field name="branch_ids" required="1" widget="many2many_tags"
+                    		options="{'no_create': True, 'no_create_edit': True}"/>
+                    </group>
+                    <footer>
+                        <button name="action_print_cn" string="Print" data-hotkey="q"
+                            colspan="1" type="object" class="btn-primary"/>
+                        <button string="Close" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <record id="action_cn_register" model="ir.actions.act_window">
+            <field name="name">Credit Note Register</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.register</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="view_cn_form"/>
+        </record>
+       
+       <menuitem id="menu_cn_register" parent="menu_sale_report" action="action_cn_register" sequence="2"/>
+       
+       <record id="view_turn_over_form" model="ir.ui.view">
+            <field name="name">Ratewise Turnover</field>
+            <field name="model">sale.register</field>
+            <field name="arch" type="xml">
+                <form string="Ratewise Turnover">
+                    <group>
+                    	<group>
+                    		<field name="start_date" required="1"/>
+                    	</group>
+                    	<group>
+                    		<field name="end_date" required="1"/>
+                    	</group>
+                    </group>
+                    <group>
+                    	<field name="branch_ids" required="1" widget="many2many_tags"
+                    		options="{'no_create': True, 'no_create_edit': True}"/>
+                    </group>
+                    <footer>
+                        <button name="action_print_rt" string="Print" data-hotkey="q"
+                            colspan="1" type="object" class="btn-primary"/>
+                        <button string="Close" class="btn-secondary" special="cancel" data-hotkey="z"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        
+        <record id="action_turn_over" model="ir.actions.act_window">
+            <field name="name">Ratewise Turnover</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.register</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="view_id" ref="view_turn_over_form"/>
+        </record>
+       
+       <menuitem id="menu_turn_over" parent="account.menu_finance_reports" action="action_turn_over" sequence="103"/>
+       
+    </data>
+</odoo>    

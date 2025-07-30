@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_account_payment_line,account_payment_line,model_account_payment_line,,1,1,1,1
+access_sale_register,sale_register,model_sale_register,,1,1,1,1
+access_purchase_register,purchase_register,model_purchase_register,,1,1,1,1
+access_doc_summary,doc_summary,model_doc_summary,,1,1,1,1
+access_hsn_report,hsn_report,model_hsn_report,,1,1,1,1
+access_statement_import,statement_import,model_statement_import,,1,1,1,1
+access_batch_payment_line,batch_payment_line,model_batch_payment_line,,1,1,1,1
+access_batch_payment_customer_line,batch_payment_customer_line,model_batch_payment_customer_line,,1,1,1,1
+access_bank_reconcile,bank_reconcile,model_bank_reconcile,,1,1,1,1
+access_bank_reconcile_line,bank_reconcile_line,model_bank_reconcile_line,,1,1,1,1
+access_partner_ledger,partner_ledger,model_partner_ledger,,1,1,1,1
+access_partner_ledger_line,partner_ledger,model_partner_ledger_line,,1,1,1,1

@@ -1,0 +1,393 @@
+<odoo>
+    
+    <record id="paperformat_serial_number_label" model="report.paperformat">
+        <field name="name">Serial Number Label</field>
+        <field name="default" eval="True" />
+        <field name="format">custom</field>
+        <field name="page_height">150</field>
+        <field name="page_width">100</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10.00</field>
+        <field name="margin_bottom">10.00</field>
+        <field name="margin_left">7.0</field>
+        <field name="margin_right">7.0</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">50</field>
+        <field name="dpi">90</field>
+    </record>
+    
+    <record id="paperformat_rm_label" model="report.paperformat">
+        <field name="name">RM Label</field>
+        <field name="default" eval="True" />
+        <field name="format">custom</field>
+        <field name="page_height">150</field>
+        <field name="page_width">100</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10.00</field>
+        <field name="margin_bottom">10.00</field>
+        <field name="margin_left">7.0</field>
+        <field name="margin_right">7.0</field>
+        <field name="header_line" eval="False" />
+        <field name="header_spacing">50</field>
+        <field name="dpi">90</field>
+    </record>
+    
+    <record id="action_serial_number_label" model="ir.actions.report">
+        <field name="name">Serial No Label</field>
+        <field name="model">stock.serial</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">etl_stock.serial_number_label_template</field>
+        <field name="report_file">etl_stock.serial_number_label_template</field>
+        <field name="paperformat_id" ref="etl_stock.paperformat_serial_number_label"/>
+        <field name="print_report_name">'Label_%s' % object.name</field>
+        <field name="binding_type">report</field>
+    </record>
+    
+    <template id="serial_number_label_template">
+        <t t-foreach="docs" t-as="o">
+            <p style="page-break-before:always;"> </p>
+            <t t-call="web.basic_layout">
+                <div class="page">
+                    <div class="oe_structure"/>
+                    <t t-set="barcode_size" t-value="'width:80mm;height:14mm'"/>
+                    <div class="o_label_4x12 text-center">
+                        <b><p style="line-height:20px;font-size:15pt">EASTERN TREADS LTD</p></b>
+                        <p style="line-height:1px;font-size:11pt;">Oonnukal P.O., Kothamangalam, Kerala.</p>
+                        <p style="line-height:1px;font-size:8pt;">CUSTOMER CARE NUMBER: +91-8589994848</p>
+                    </div>
+                    <t t-if="o.lot_id.product_id.categ_id.fg_type == 'pctr'">
+                        <div class="o_label_4x12 text-center">
+                            <div t-out="o.name" t-options="{'widget': 'barcode', 'img_style': barcode_size}"/>
+                            <div class="o_label_4x12 text-center" t-out="o.name"/><br/>
+                            <p style="line-height:2px;font-size:10pt;"><u><b>PRECURED TREAD RUBBER(Made in India)</b></u></p>
+                        </div>
+                        <table style="border:0px solid white;width=100%">
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>PRODUCT NAME</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.product_id.name"/></b></td>
+                            </tr>
+                            <tr style="font-size:11pt;">
+                                <td width="40%"><b>TYRE SIZE</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%"><span t-field="o.product_id.tyre_size"/></td>
+                            </tr>
+                            <t t-if="o.lot_id.label_type != 'export_us'">
+	                            <tr style="font-size:11pt;">
+	                                <td width="40%"><b>BASE WIDTH(mm)</b></td>
+	                                <td width="1%">:</td>
+	                                <td width="59%"><span t-field="o.product_id.product_width"/></td>
+	                            </tr>
+	                        </t>
+	                        <t t-if="o.lot_id.label_type == 'export_us'">
+	                            <tr style="font-size:11pt;">
+	                                <td width="40%"><b>BASE WIDTH</b></td>
+	                                <td width="1%">:</td>
+	                                <td width="59%"><span t-esc="o.product_id.get_product_width_us()"/></td>
+	                            </tr>
+	                        </t>
+                            <t t-if="o.lot_id.label_type == 'local'">
+                                <tr style="font-size:11pt;">
+                                    <td width="40%"><b>LENGTH(Inch)</b></td>
+                                    <td width="1%">:</td>
+                                    <td width="59%"><span t-field="o.product_id.product_length"/></td>
+                                </tr>
+                            </t>
+                            <t t-if="o.lot_id.label_type == 'export'">
+	                            <tr style="font-size:11pt;">
+	                                <td width="40%"><b>LENGTH(mm)</b></td>
+	                                <td width="1%">:</td>
+	                                <td width="59%"><span t-field="o.product_id.product_length_mm"/></td>
+	                            </tr>
+	                       	</t>
+	                       	<t t-if="o.lot_id.label_type == 'export_us'">
+	                            <tr style="font-size:11pt;">
+	                                <td width="40%"><b>LENGTH</b></td>
+	                                <td width="1%">:</td>
+	                                <td width="59%"><span t-esc="o.product_id.get_product_length_us()"/></td>
+	                            </tr>
+	                       	</t>
+	                        <t t-if="o.lot_id.label_type != 'export_us'">
+	                            <tr>
+	                                <td width="40%" style="font-size:11pt;"><b>WEIGHT(Kg)</b></td>
+	                                <td width="1%">:</td>
+	                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.initial_qty"/></b></td>
+	                            </tr>
+	                        </t>
+	                        <t t-if="o.lot_id.label_type == 'export_us'">
+	                            <tr>
+	                                <td width="40%" style="font-size:11pt;"><b>WEIGHT in Pound</b></td>
+	                                <td width="1%">:</td>
+	                                <td width="59%" style="font-size:13pt;"><b><span t-esc="o.get_pound(o.initial_qty)"/></b></td>
+	                            </tr>
+	                        </t>
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>LOT NO</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.lot_id.name"/></b></td>
+                            </tr>
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>SL NO</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.name"/></b></td>
+                            </tr>
+                            <tr style="font-size:11pt;">
+                                <td width="40%"><b>DATE OF MFG</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%"><span t-field="o.date" t-options="{'widget': 'date'}"/></td>
+                            </tr>
+                            <t t-if="o.lot_id.label_type == 'local'">
+                                <tr style="font-size:11pt;">
+                                    <td width="40%"><b>MRP(Including Tax)</b></td>
+                                    <td width="1%">:</td>
+                                    <td width="59%"><span t-field="o.product_id.MRP_product"/></td>
+                                </tr>
+                            </t>
+                        </table>
+                        <br/>
+                    </t>
+                    <t t-if="o.lot_id.product_id.categ_id.fg_type == 'ct'">
+                        <div class="o_label_4x12 text-center">
+                            <div t-out="o.name" t-options="{'widget': 'barcode', 'img_style': barcode_size}"/>
+                            <div class="o_label_4x12 text-center" t-out="o.name"/><br/>
+                            <p style="line-height:2px;font-size:10pt;"><u><b>CONVENTIONAL TREAD(Made in India)</b></u></p>
+                            <p style="line-height:2px;font-size:10pt;text-align:center"><u><b>(HOT RUBBER)</b></u></p>
+                        </div>
+                        <table style="border:0px solid white;width=100%">
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>PRODUCT NAME</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.product_id.name"/></b></td>
+                            </tr>
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>WEIGHT</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.initial_qty"/></b></td>
+                            </tr>
+                            <tr style="font-size:11pt;">
+                                <td width="40%"><b>DATE OF MFG</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%"> </td>
+                            </tr>
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>LOT NO</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.lot_id.name"/></b></td>
+                            </tr>
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>SL NO</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.name"/></b></td>
+                            </tr>
+                            <tr style="font-size:11pt;">
+                                <td width="40%"><b>CURING TIME</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%">5 min/gauge</td>
+                            </tr>
+                            <t t-if="o.lot_id.label_type == 'local'">
+                                <tr style="font-size:11pt;">
+                                    <td width="40%"><b>MRP(Including Tax)</b></td>
+                                    <td width="1%">:</td>
+                                    <td width="59%"><span t-field="o.product_id.MRP_product"/></td>
+                                </tr>
+                            </t>
+                        </table>
+                        <br/>
+                        <table width="100%" style="border:0px solid white;width=100%">
+                        	<tr>
+                        		<td width="100%" style="text-align:center;font-size:10pt;"><b>Best Before : 3 Months from the Date of Mfg.</b></td>
+                        	</tr>
+                        </table>
+                    </t>
+                    <t t-if="o.lot_id.product_id.categ_id.fg_type == 'bg'">
+                        <div class="o_label_4x12 text-center">
+                            <div t-out="o.name" t-options="{'widget': 'barcode', 'img_style': barcode_size}"/>
+                            <div class="o_label_4x12 text-center" t-out="o.name"/><br/>
+                            <p style="line-height:2px;font-size:10pt;"><u><b>BONDING GUM(Made In India)</b></u></p>
+                        </div>
+                        <table style="border:0px solid white;width=100%">
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>PRODUCT NAME</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.product_id.name"/></b></td>
+                            </tr>
+                            <tr style="font-size:11pt;">
+                                <td width="40%"><b>CURING TEMPERATURE</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%">125/150 Degree Celsius</td>
+                            </tr>
+                            <tr style="font-size:11pt;">
+                                <td width="40%"><b>WIDTH</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%"><span t-field="o.product_id.product_width"/></td>
+                            </tr>
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>WEIGHT</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.initial_qty"/></b></td>
+                            </tr>
+                            <tr style="font-size:11pt;">
+                                <td width="40%"><b>DATE OF MFG</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%"> </td>
+                            </tr>
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>LOT NO</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.lot_id.name"/></b></td>
+                            </tr>
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>SL NO</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.name"/></b></td>
+                            </tr>
+                            <t t-if="o.lot_id.label_type == 'local'">
+                                <tr style="font-size:11pt;">
+                                    <td width="40%"><b>MRP(Including Tax)</b></td>
+                                    <td width="1%">:</td>
+                                    <td width="59%"><span t-field="o.product_id.MRP_product"/></td>
+                                </tr>
+                            </t>
+                        </table>
+                        <br/>
+                        <table width="100%" style="border:0px solid white;width=100%">
+                        	<tr>
+                        		<td width="22%" style="font-size:10pt;"><b>Best Before :</b></td>
+                        		<td width="78%" style="font-size:10pt;"><b>Fast Cure - 2 Months from the Date of Mfg.</b></td>
+                        	</tr>
+                        	<tr>
+                        		<td width="22%" style="font-size:10pt;"></td>
+                        		<td width="78%" style="font-size:10pt;"><b>Other Grades - 3 Months from the Date of Mfg.</b></td>
+                        	</tr>
+                        </table>
+                    </t>
+                    <t t-if="o.lot_id.product_id.categ_id.fg_type == 'bvc'">
+                        <div class="o_label_4x12 text-center">
+                            <div t-out="o.name" t-options="{'widget': 'barcode', 'img_style': barcode_size}"/>
+                            <div class="o_label_4x12 text-center" t-out="o.name"/><br/>
+                            <p style="line-height:2px;font-size:10pt;"><u><b>BLACK VULCANISING CEMENT(Made in India)</b></u></p>
+                        </div>
+                        <table style="border:0px solid white;width=100%">
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>PRODUCT NAME</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.product_id.name"/></b></td>
+                            </tr>
+                            <tr style="font-size:11pt;">
+                                <td width="40%"><b>CURING TEMPERATURE</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%">99 / 125 / 150</td>
+                            </tr>
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>QUANTITY</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-esc="int(o.initial_qty)"/></b><b>Liters(At the time of packing)</b></td>
+                            </tr>
+                            <tr style="font-size:11pt;">
+                                <td width="40%"><b>DATE OF MFG</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%"> </td>
+                            </tr>
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>LOT NO</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.lot_id.name"/></b></td>
+                            </tr>
+                            <tr>
+                                <td width="40%" style="font-size:11pt;"><b>SL NO</b></td>
+                                <td width="1%">:</td>
+                                <td width="59%" style="font-size:13pt;"><b><span t-field="o.name"/></b></td>
+                            </tr>
+                            <t t-if="o.lot_id.label_type == 'local'">
+                                <tr style="font-size:11pt;">
+                                    <td width="40%"><b>MRP(Including Tax)</b></td>
+                                    <td width="1%">:</td>
+                                    <td width="59%"><span t-field="o.product_id.MRP_product"/></td>
+                                </tr>
+                            </t>
+                        </table>
+                        <br/>
+                        <table width="100%" style="border:0px solid white;width=100%">
+                        	<tr>
+                        		<td width="100%" style="text-align:center;font-size:10pt;"><b>Best Before : 180 Days from the Date of Mfg.</b></td>
+                        	</tr>
+                        </table>
+                    </t>
+                    <t t-if="o.lot_id.label_type == 'export_us'">
+                    	<table width="100%" style="border:0px solid white;">
+                    		<tr><br/><td width="100%" style="text-align:center;font-size:15pt;">Made in India</td></tr>
+                    	</table>
+                    </t>
+                    <table width="100%" style="border:0px solid white;">
+                    	<tr><br/><td width="100%" style="text-align:center;font-size:11pt;">For Industrial Purpose only</td></tr>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+    
+    <record id="action_rm_label" model="ir.actions.report">
+        <field name="name">RM Label</field>
+        <field name="model">stock.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">etl_stock.rm_label_template</field>
+        <field name="report_file">etl_stock.rm_label_template</field>
+        <field name="paperformat_id" ref="etl_stock.paperformat_rm_label"/>
+        <field name="print_report_name">'Label_%s' % object.product_id.name</field>
+        <field name="binding_type">report</field>
+    </record>
+    
+    <template id="rm_label_template">
+        <t t-foreach="docs" t-as="o">
+            <p style="page-break-before:always;"> </p>
+            <t t-call="web.basic_layout">
+                <div class="page fa-rotate-90">
+                    <div class="oe_structure"/>
+                    <t t-set="barcode_size" t-value="'width:80mm;height:14mm'"/>
+                    <div class="o_label_4x12 text-center">
+                        <b><p style="line-height:20px;font-size:15pt">EASTERN TREADS LTD</p></b>
+                        <p style="line-height:1px;font-size:11pt;">Oonnukal P.O., Kothamangalam, Kerala.</p>
+                        <p style="line-height:1px;font-size:8pt;">CUSTOMER CARE NUMBER: +91-8589994848</p>
+                    </div>
+                       <div class="o_label_4x12 text-center">
+                            <div t-out="o.get_lot_numbers()" t-options="{'widget': 'barcode', 'img_style': barcode_size}"/>
+                            <div class="o_label_4x12 text-center" t-out="o.get_lot_numbers()"/><br/>
+                        </div>
+                        <table style="border:0px solid white;width=100%">
+                           <tr>
+                               <td width="34%" style="font-size:14pt;"><b>Product Name</b></td>
+                               <td width="1%">:</td>
+                               <td width="65%" style="font-size:18pt;padding-left:5px;"><b><span t-field="o.product_id.name"/></b></td>
+                           </tr>
+                           <tr>
+                               <td width="34%" style="font-size:14pt;"><b>Internal Reference</b></td>
+                               <td width="1%">:</td>
+                               <td width="65%" style="font-size:18pt;padding-left:5px;"><b><span t-field="o.product_id.default_code"/></b></td>
+                           </tr>
+                           <tr style="font-size:11pt;">
+                               <td width="34%"><b>Receipt Date</b></td>
+                               <td width="1%">:</td>
+                               <td width="65%" style="padding-left:5px;"><span t-field="o.date"/></td>
+                           </tr>
+                           <tr style="font-size:11pt;">
+                               <td width="34%"><b>Vendor Name</b></td>
+                               <td width="1%">:</td>
+                               <td width="65%" style="padding-left:5px;"><span t-field="o.picking_id.partner_id.name"/></td>
+                           </tr>
+                               <tr style="font-size:11pt;">
+                                   <td width="34%"><b>Quantity</b></td>
+                                   <td width="1%">:</td>
+                                   <td width="65%" style="padding-left:5px;"><span t-field="o.quantity_done"/></td>
+                               </tr>
+                            <tr style="font-size:14pt;">
+                                <td width="34%"><b>Lot No.</b></td>
+                                <td width="1%">:</td>
+                                <td width="65%" style="font-size:18pt;padding-left:5px;"><span t-esc="o.get_lot_numbers()"/></td>
+                            </tr>
+                       </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

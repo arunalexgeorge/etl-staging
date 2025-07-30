@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>        
+
+        <record id="view_grn_parameter_form" model="ir.ui.view">
+            <field name="name">grn.parameter.form</field>
+            <field name="model">grn.parameter</field>
+            <field name="arch" type="xml">
+                <form string="GRN Parameters">
+                    <sheet>
+                    	<widget name="web_ribbon" title="Archived" bg_color="bg-danger" attrs="{'invisible': [('active', '=', True)]}"/>
+                   		<group>
+	                        <field name="product_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+	                        <field name="active" invisible="1"/>
+                       	</group>
+                       	<group colspan="4" col="2">
+                       		<field name="line_ids" nolabel="1" colspan="2">
+                       			<tree editable="bottom">
+                       				<field name="name"/>
+                       				<field name="specification"/>
+                       			</tree>
+                       			<form>
+                       				<field name="name"/>
+                       				<field name="specification"/>
+                       			</form>
+                       		</field>
+                       	</group>
+                    
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_grn_parameter_tree" model="ir.ui.view">
+            <field name="name">grn.parameter.tree</field>
+            <field name="model">grn.parameter</field>
+            <field name="arch" type="xml">
+                <tree string="GRN Parameters">
+                    <field name="product_id"/>
+                    <field name="line_ids" widget="many2many_tags"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_grn_parameters" model="ir.actions.act_window">
+            <field name="name">GRN Parameters</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">grn.parameter</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_quality" name="Quality" sequence="150" web_icon="quality_control,static/description/icon.svg"/>
+        <menuitem id="menu_quality_parameters" name="Quality Parameters" 
+        	parent="menu_quality" sequence="5"/>
+        <menuitem id="menu_grn_parameters" name="GRN Parameters" 
+        	parent="menu_quality_parameters" action="action_grn_parameters" sequence="0"/>
+        
+        <record id="view_mo_parameter_form" model="ir.ui.view">
+            <field name="name">mo.parameter.form</field>
+            <field name="model">mo.parameter</field>
+            <field name="arch" type="xml">
+                <form string="MO Parameters">
+                    <sheet>
+                    		<group>
+		                        <field name="product_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+                        	</group>
+                        	<group colspan="4" col="2">
+                        		<field name="line_ids" nolabel="1" colspan="2">
+                        			<tree editable="bottom">
+                        				<field name="name"/>
+                        				<field name="specification"/>
+                        			</tree>
+                        			<form>
+                        				<field name="name"/>
+                        			</form>
+                        		</field>
+                        	</group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_mo_parameter_tree" model="ir.ui.view">
+            <field name="name">mo.parameter.tree</field>
+            <field name="model">mo.parameter</field>
+            <field name="arch" type="xml">
+                <tree string="MO Parameters">
+                    <field name="product_id"/>
+                    <field name="line_ids" widget="many2many_tags"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_mo_parameters" model="ir.actions.act_window">
+            <field name="name">MO Parameters</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mo.parameter</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <menuitem id="menu_mo_parameters" name="MO Parameters" 
+        	parent="menu_quality_parameters" action="action_mo_parameters" sequence="1"/>
+
+    </data>
+</odoo>

@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>        
+
+        <record id="view_grn_qc_form" model="ir.ui.view">
+            <field name="name">grn.qc.form</field>
+            <field name="model">grn.qc</field>
+            <field name="arch" type="xml">
+                <form string="GRN QCs" create="false" delete="false">
+                   	<header>
+	                    <field name="state" widget="statusbar"/>
+	                    <button name="action_ongoing" string="Ongoing" type="object" states="pending"/>
+	                    <button name="action_completed" string="Completed" type="object" states="ongoing"/>
+	                    <button name="action_reset" string="Reset" type="object" states="completed" groups="etl_base.group_qc_reset"/>
+	                    <button name="action_print_grn_qc" string="Print" type="object" states="completed"/>
+               		</header>
+                	<sheet>
+                		<group>
+                			<group>
+		                        <field name="product_id" readonly="1" options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+		                        <field name="picking_id" readonly="1" options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+		                        <field name="purchase_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+		                        <field name="partner_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+                       		</group>
+                       		<group>
+                       			<field name="date" required="True" attrs="{'readonly': [('state', '=', 'completed')]}"/>
+                       			<field name="accept_qty" attrs="{'readonly': [('state', '=', 'completed')]}"/>
+                       			<field name="reject_qty" attrs="{'readonly': [('state', '=', 'completed')]}"/>
+                       			<field name="grn_qty" readonly="1"/>
+                       		</group>
+                		</group>
+                       	<group colspan="4" col="2">
+                       		<field name="line_ids" nolabel="1" colspan="2" attrs="{'readonly': [('state', '=', 'completed')]}">
+                       			<tree editable="bottom" create="false">
+                       				<field name="product_id" readonly="1" invisible="1"
+                       					options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+                       				<field name="name" readonly="1"/>
+                       				<field name="specification" readonly="1"/>
+                       				<field name="result_value" required="1"/>
+                       				<field name="result" required="1"/>
+                       			</tree>
+                       			<form>
+                       				<group>
+                       					<field name="product_id" options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+                       					<field name="name"/>
+                       					<field name="specification"/>
+                       					<field name="result_value"/>
+                       					<field name="result"/>
+                       				</group>
+                       			</form>
+                       		</field>
+                       	</group>
+                       	<group>
+                       		<field name="remarks"/>
+                       	</group>
+                    </sheet>
+                    <div class="o_attachment_preview"/>
+	                <div class="oe_chatter">
+	                    <field name="message_follower_ids" groups="base.group_user"/>
+	                    <field name="activity_ids"/>
+	                    <field name="message_ids"/>
+	                </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_grn_qc_tree" model="ir.ui.view">
+            <field name="name">grn.qc.tree</field>
+            <field name="model">grn.qc</field>
+            <field name="arch" type="xml">
+                <tree string="GRN QC" create="false" delete="false">
+	                <field name="date"/>
+	                <field name="product_id"/>
+	                <field name="picking_id"/>
+	                <field name="purchase_id"/>
+	                <field name="partner_id"/>
+	                <field name="state" widget="badge" decoration-success="state == 'completed'" decoration-warning="state == 'ongoing'" decoration-info="state == 'pending'"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_grn_qcs" model="ir.actions.act_window">
+            <field name="name">GRN QC</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">grn.qc</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_qcs" name="Quality Checks" parent="menu_quality" sequence="4"/>
+        <menuitem id="menu_grn_qcs" name="GRN QCs" parent="menu_qcs" action="action_grn_qcs" sequence="0"/>
+        
+        <record id="view_mo_qc_form" model="ir.ui.view">
+            <field name="name">mo.qc.form</field>
+            <field name="model">mo.qc</field>
+            <field name="arch" type="xml">
+                <form string="MO QCs" create="false" delete="false">
+                   	<header>
+	                    <field name="state" widget="statusbar"/>
+	                    <button name="action_ongoing" string="Ongoing" type="object" states="pending"/>
+	                    <button name="action_completed" string="Completed" type="object" states="ongoing"/>
+						<button name="action_print_mo_qc" string="Print" type="object" states="completed"/>
+               		</header>
+                	<sheet>
+                		<group>
+                			<group>
+		                        <field name="production_id" readonly="1" options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+		                        <field name="product_id" readonly="1"
+		                        	options="{'no_create_edit':True, 'no_create':True,'no_open': True}"/>
+                       		</group>
+                       		<group>
+                       			<field name="date" required="1" attrs="{'readonly': [('state', '=', 'completed')]}"/>
+                       			<field name="accept_qty" attrs="{'readonly': [('state', '=', 'completed')]}"/>
+                       			<field name="reject_qty" attrs="{'readonly': [('state', '=', 'completed')]}"/>
+                       		</group>
+                		</group>
+                       	<group colspan="4" col="2">
+                       		<field name="line_ids" nolabel="1" colspan="2" attrs="{'readonly': [('state', '=', 'completed')]}">
+                       			<tree editable="bottom" create="false">
+                       				<field name="name"/>
+                       				<field name="specification" readonly="1"/>
+                       				<field name="result_value" required="1"/>
+                       				<field name="result" required="1"/>
+                       			</tree>
+                       			<form>
+                       				<group>
+                       					<field name="name"/>
+                       					<field name="specification" readonly="1"/>
+	                       				<field name="result_value" required="1"/>
+	                       				<field name="result" required="1"/>
+                       				</group>
+                       			</form>
+                       		</field>
+                       	</group>
+                       	<group>
+                       		<field name="remarks"/>
+                       	</group>
+                    </sheet>
+                    <div class="o_attachment_preview"/>
+	                <div class="oe_chatter">
+	                    <field name="message_follower_ids" groups="base.group_user"/>
+	                    <field name="activity_ids"/>
+	                    <field name="message_ids"/>
+	                </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_mo_qc_tree" model="ir.ui.view">
+            <field name="name">mo.qc.tree</field>
+            <field name="model">mo.qc</field>
+            <field name="arch" type="xml">
+                <tree string="MO QC" create="false" delete="false">
+                    <field name="production_id"/>
+	                <field name="date"/>
+	                <field name="product_id"/>
+	                <field name="state" widget="badge" decoration-success="state == 'completed'" decoration-warning="state == 'ongoing'" decoration-info="state == 'pending'"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_mo_qcs" model="ir.actions.act_window">
+            <field name="name">MO QC</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">mo.qc</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        
+        <menuitem id="menu_mo_qcs" name="MO QCs" parent="menu_qcs" action="action_mo_qcs" sequence="1"/>
+
+    </data>
+</odoo>

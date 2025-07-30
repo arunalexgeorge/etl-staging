@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data>
+    
+    <record id="mrp_production_form_view" model="ir.ui.view">
+        <field name="name">mrp.production.form</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+	            <button class="oe_stat_button" type="object" name="action_open_qcs"
+	                    icon="fa-users">
+	                 <div class="o_stat_info">
+	                     <span class="o_stat_text">
+								Quality Check
+                         </span>
+                         <span class="o_stat_value">
+                             <field name="qc_status"/>
+	                     </span>
+                     </div>
+	            </button>
+	       	</xpath>
+
+        </field>
+    </record>
+    
+    
+</data></odoo>

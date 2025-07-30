@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_res_branch_usr,res.branch.user,model_res_branch,branch.group_branch_usr,1,0,0,0
+access_res_branch_adm,res.branch.user,model_res_branch,branch.group_branch_adm,1,1,1,0
+access_branch_location,res.location,model_branch_location,,1,1,1,1

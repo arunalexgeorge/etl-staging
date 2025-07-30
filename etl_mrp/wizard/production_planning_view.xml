@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="view_production_planning_report" model="ir.ui.view">
+            <field name="name">production.planning.report</field>
+            <field name="model">production.planning.report</field>
+            <field name="arch" type="xml">
+                <form string="Production Planning Report">
+                    <group colspan="4" col="2">
+                        <field name="order_ids" required="1" nolabel="1"/>
+                    </group>
+                    <footer>
+                        <button name="print_report" string="Print Report" data-hotkey="q"
+                            colspan="1" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_production_planning_report" model="ir.actions.act_window">
+            <field name="name">Production Planning Report</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">production.planning.report</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        
+        <menuitem id="menu_production_planning_report" action="action_production_planning_report" name="Production Planning Report" 
+        	parent="mrp.menu_mrp_reporting" sequence="0"/>
+       
+    </data>
+</odoo>    

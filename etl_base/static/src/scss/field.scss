@@ -1,0 +1,8 @@
+:root {
+  --margin-bottom-color:inherit;
+}
+$marginBottomColor: var(--margin-bottom-color);
+
+.o_required_modifier .o_input {
+    border-bottom : solid $marginBottomColor 2px !important;
+}

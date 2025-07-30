@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data>
+    
+    <record id="view_picking_form" model="ir.ui.view">
+        <field name="name">stock.picking.form</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+	       	<xpath expr="//field[@name='move_ids_without_package']/tree//field[@name='product_id']" position="after">
+            	<field name="qc_status" attrs="{'column_invisible': [('parent.grn', '!=', True)]}"/>
+            	<field name="qc_id" invisible="1" attrs="{'column_invisible': [('parent.grn', '!=', True)]}"/>
+            	<field name="need_qc" invisible="1"/>
+            	<button class="oe_stat_button" type="object" name="action_qc"
+	            	attrs="{'invisible': [('need_qc', '!=', True)]}" string="QC">
+	            </button>
+            </xpath>
+	       	<xpath expr="//field[@name='partner_id']" position="after">
+	       		<field name="grn" invisible="1"/>
+	       	</xpath>
+        </field>
+    </record>
+    
+</data></odoo>
